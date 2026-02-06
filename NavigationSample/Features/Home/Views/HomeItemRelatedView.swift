@@ -58,11 +58,6 @@ struct HomeItemRelatedView: View {
                     router.showEdit(itemId: item.id)
                 }
                 .foregroundStyle(.blue)
-
-                Button("ログインが必要な機能") {
-                    router.sendEvent(.requireLogin)
-                }
-                .foregroundStyle(.blue)
             } header: {
                 Text("アクション")
             }

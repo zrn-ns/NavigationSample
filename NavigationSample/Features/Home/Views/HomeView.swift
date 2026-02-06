@@ -36,10 +36,6 @@ struct HomeView: View {
             }
 
             Section {
-                Button("ログインが必要な機能") {
-                    router.sendEvent(.requireLogin)
-                }
-
                 Button("設定を開く") {
                     router.sendEvent(.openSettings)
                 }

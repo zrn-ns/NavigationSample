@@ -40,11 +40,6 @@ struct HomeItemDetailView: View {
                 }
                 .buttonStyle(.borderedProminent)
 
-                Button("ログインが必要な機能") {
-                    router.sendEvent(.requireLogin)
-                }
-                .buttonStyle(.bordered)
-
                 Button("戻る") {
                     dismiss()
                 }

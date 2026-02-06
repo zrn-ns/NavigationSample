@@ -12,4 +12,6 @@ import Foundation
 enum SettingsEvent {
     /// ホーム画面を開きたい
     case openHome
+    /// ログインが必要
+    case requireLogin
 }

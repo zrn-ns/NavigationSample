@@ -32,8 +32,6 @@ extension AppRouter {
     /// Home Feature からのイベントを処理
     func handle(_ event: HomeEvent) {
         switch event {
-        case .requireLogin:
-            modal = .login
         case .openSettings:
             selectedTab = .settings
         }
@@ -44,6 +42,8 @@ extension AppRouter {
         switch event {
         case .openHome:
             selectedTab = .home
+        case .requireLogin:
+            modal = .login
         }
     }
 

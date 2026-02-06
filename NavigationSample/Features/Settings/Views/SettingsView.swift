@@ -40,6 +40,10 @@ struct SettingsView: View {
             }
 
             Section {
+                Button("ログイン") {
+                    router.sendEvent(.requireLogin)
+                }
+
                 Button("ホームに戻る") {
                     router.sendEvent(.openHome)
                 }
