@@ -8,11 +8,11 @@ import SwiftUI
 /// ホーム画面（アイテム一覧）
 ///
 /// 原則9: Viewは遷移の決定権を持たない
-/// - onNavigate: Feature内遷移の意図を表明
+/// - router: Feature内遷移用（バケツリレー）
 /// - onEvent: Feature外遷移の意図を表明
 struct HomeView: View {
     let items: [Item]
-    let onNavigate: (HomeRoute) -> Void
+    let router: HomeRouter
     let onEvent: (HomeEvent) -> Void
 
     var body: some View {
@@ -20,7 +20,7 @@ struct HomeView: View {
             Section {
                 ForEach(items) { item in
                     Button {
-                        onNavigate(.itemDetail(item.id))
+                        router.navigate(to: .itemDetail(item.id))
                     } label: {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(item.title)
@@ -56,7 +56,7 @@ struct HomeView: View {
     NavigationStack {
         HomeView(
             items: Item.samples,
-            onNavigate: { _ in },
+            router: HomeRouter(),
             onEvent: { _ in }
         )
     }

@@ -7,16 +7,12 @@ import SwiftUI
 
 /// 関連アイテム画面（2段階目の push 遷移）
 ///
-/// バケツリレーの例:
-/// - onNavigate: さらに深い階層への遷移用（RootView から伝播）
-/// - onShowEdit: 編集モーダル表示用（RootView から伝播）
+/// router のみをバケツリレーすることで、引数の増加を抑制
 struct HomeItemRelatedView: View {
     let item: Item
     let relatedItems: [Item]
-    /// Feature 内の push 遷移（バケツリレー）
-    let onNavigate: (HomeRoute) -> Void
-    /// 編集モーダルを表示したいという意図の表明（バケツリレー）
-    let onShowEdit: (Item.ID) -> Void
+    /// Feature 内ルーティング（バケツリレー）
+    let router: HomeRouter
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -36,7 +32,7 @@ struct HomeItemRelatedView: View {
             Section {
                 ForEach(relatedItems) { relatedItem in
                     Button {
-                        onNavigate(.itemDetail(relatedItem.id))
+                        router.navigate(to: .itemDetail(relatedItem.id))
                     } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
@@ -59,7 +55,7 @@ struct HomeItemRelatedView: View {
 
             Section {
                 Button("このアイテムを編集") {
-                    onShowEdit(item.id)
+                    router.showEdit(itemId: item.id)
                 }
                 .foregroundStyle(.blue)
             } header: {
@@ -76,8 +72,7 @@ struct HomeItemRelatedView: View {
         HomeItemRelatedView(
             item: Item.samples[0],
             relatedItems: Array(Item.samples.dropFirst()),
-            onNavigate: { _ in },
-            onShowEdit: { _ in }
+            router: HomeRouter()
         )
     }
 }

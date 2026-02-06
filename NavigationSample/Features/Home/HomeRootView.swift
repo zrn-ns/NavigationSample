@@ -9,37 +9,20 @@ import SwiftUI
 ///
 /// 手段2: NavigationStackはFeatureのRootにのみ置く
 ///
-/// バケツリレーの中継点:
-/// - onNavigate: 全ての子 View に渡して path.append を実行
-/// - onShowEdit: 全ての子 View に渡して modal を設定
+/// HomeRouter を生成し、子 View にバケツリレーで渡す。
+/// router 1つだけをバケツリレーすることで、引数の増加を抑制。
 struct HomeRootView: View {
-    /// Feature内のpush遷移状態
-    /// 原則3: Push用の状態とModal用の状態は分離する
-    @State private var path: [HomeRoute] = []
-
-    /// Feature内のmodal状態
-    @State private var modal: HomeModal?
+    /// Feature 内ルーティング（path と modal を管理）
+    @State private var router = HomeRouter()
 
     /// App層へのイベント通知
     let onEvent: (HomeEvent) -> Void
 
-    // MARK: - バケツリレー用のコールバック
-
-    /// Feature 内の push 遷移を処理
-    private func navigate(to route: HomeRoute) {
-        path.append(route)
-    }
-
-    /// 編集モーダルを表示
-    private func showEdit(itemId: Item.ID) {
-        modal = .edit(itemId)
-    }
-
     var body: some View {
-        NavigationStack(path: $path) {
+        NavigationStack(path: $router.path) {
             HomeView(
                 items: Item.samples,
-                onNavigate: navigate,
+                router: router,
                 onEvent: onEvent
             )
             .navigationDestination(for: HomeRoute.self) { route in
@@ -48,26 +31,23 @@ struct HomeRootView: View {
                     if let item = Item.samples.first(where: { $0.id == itemId }) {
                         HomeItemDetailView(
                             item: item,
-                            onNavigate: navigate,  // バケツリレー
-                            onShowEdit: { showEdit(itemId: item.id) }
+                            router: router  // バケツリレー
                         )
                     }
 
                 case .itemRelated(let itemId):
                     if let item = Item.samples.first(where: { $0.id == itemId }) {
-                        // 関連アイテムとして、自分以外のアイテムを表示
                         let relatedItems = Item.samples.filter { $0.id != itemId }
                         HomeItemRelatedView(
                             item: item,
                             relatedItems: relatedItems,
-                            onNavigate: navigate,    // バケツリレー
-                            onShowEdit: showEdit     // バケツリレー
+                            router: router  // バケツリレー
                         )
                     }
                 }
             }
         }
-        .sheet(item: $modal) { modal in
+        .sheet(item: $router.modal) { modal in
             switch modal {
             case .edit(let itemId):
                 if let item = Item.samples.first(where: { $0.id == itemId }) {
@@ -75,10 +55,10 @@ struct HomeRootView: View {
                         item: item,
                         onSave: { _ in
                             // 実際のアプリではここで保存処理を行う
-                            self.modal = nil
+                            router.dismissModal()
                         },
                         onCancel: {
-                            self.modal = nil
+                            router.dismissModal()
                         }
                     )
                 }
