@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct NavigationSampleApp: App {
+    /// アプリ全体の状態
+    @State private var appState = AppState()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView(appState: appState)
         }
     }
 }

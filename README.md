@@ -50,6 +50,80 @@ NavigationSample/
 └── NavigationSample/  # サンプル実装
 ```
 
+## サンプル実装
+
+### ディレクトリ構造
+
+```
+NavigationSample/
+├── App/
+│   ├── NavigationSampleApp.swift   # エントリポイント
+│   ├── AppState.swift              # アプリ全体の状態管理
+│   ├── AppModal.swift              # App全体Modal定義
+│   ├── AppModalRoot.swift          # Modalルーティング
+│   └── MainTabView.swift           # TabView管理
+│
+├── Features/
+│   ├── Home/
+│   │   ├── HomeRoute.swift         # push用Route
+│   │   ├── HomeEvent.swift         # App層へのイベント
+│   │   ├── HomeRootView.swift      # NavigationStack配置
+│   │   ├── HomeView.swift          # 一覧画面
+│   │   └── HomeItemDetailView.swift # 詳細画面
+│   │
+│   ├── Settings/
+│   │   ├── SettingsRoute.swift
+│   │   ├── SettingsEvent.swift
+│   │   ├── SettingsRootView.swift
+│   │   ├── SettingsView.swift
+│   │   └── SettingsDetailView.swift
+│   │
+│   └── Login/
+│       ├── LoginRoute.swift
+│       ├── LoginEvent.swift
+│       ├── LoginRootView.swift
+│       ├── LoginStartView.swift
+│       └── LoginCompleteView.swift
+│
+└── Shared/
+    └── Models/
+        └── Item.swift              # サンプルモデル
+```
+
+### 設計原則の適用
+
+| 原則 | 実装での適用 |
+|------|-------------|
+| 原則1: push は Feature 内限定 | `HomeRoute` は Home 内のみで使用 |
+| 原則3: push/modal 状態分離 | `path: [Route]` と `modal: AppModal?` を分離 |
+| 原則9: View は遷移決定権なし | `onNavigate` / `onEvent` コールバックで意図表明 |
+| 原則12: Modal結果はイベント | `LoginEvent.completed` / `cancelled` で返却 |
+
+### 連携フロー
+
+```
+┌──────────────────────────────────────────────────┐
+│                  App Layer                        │
+│  AppState.handle(event) → 状態変更 → UI更新      │
+└───────────────────┬──────────────────────────────┘
+                    │ Event
+┌───────────────────▼──────────────────────────────┐
+│               Feature Layer                       │
+│  HomeRootView ─ path操作 ─ HomeView              │
+│       │                         │                 │
+│       │ onEvent                 │ onNavigate      │
+│       ▼                         ▼                 │
+│  App層へ委譲               path.append()          │
+└──────────────────────────────────────────────────┘
+```
+
+### 動作確認できる機能
+
+- **Home Feature**: アイテム一覧 → 詳細画面への push/pop 遷移
+- **Settings Feature**: 設定項目 → 詳細画面への push/pop 遷移
+- **Tab 切り替え**: Home ↔ Settings のタブ切り替え（Event 経由）
+- **Login Modal**: Home からログインモーダル表示 → 完了/キャンセルで自動クローズ
+
 ## ライセンス
 
 MIT License
