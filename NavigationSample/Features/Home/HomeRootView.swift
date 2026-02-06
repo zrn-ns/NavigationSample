@@ -13,6 +13,9 @@ struct HomeRootView: View {
     /// 原則3: Push用の状態とModal用の状態は分離する
     @State private var path: [HomeRoute] = []
 
+    /// Feature内のmodal状態
+    @State private var modal: HomeModal?
+
     /// App層へのイベント通知
     let onEvent: (HomeEvent) -> Void
 
@@ -29,8 +32,30 @@ struct HomeRootView: View {
                 switch route {
                 case .itemDetail(let itemId):
                     if let item = Item.samples.first(where: { $0.id == itemId }) {
-                        HomeItemDetailView(item: item)
+                        HomeItemDetailView(
+                            item: item,
+                            onShowEdit: {
+                                modal = .edit(item.id)
+                            }
+                        )
                     }
+                }
+            }
+        }
+        .sheet(item: $modal) { modal in
+            switch modal {
+            case .edit(let itemId):
+                if let item = Item.samples.first(where: { $0.id == itemId }) {
+                    HomeItemEditView(
+                        item: item,
+                        onSave: { _ in
+                            // 実際のアプリではここで保存処理を行う
+                            self.modal = nil
+                        },
+                        onCancel: {
+                            self.modal = nil
+                        }
+                    )
                 }
             }
         }
