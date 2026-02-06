@@ -29,12 +29,7 @@ struct HomeRootView: View {
                 switch route {
                 case .itemDetail(let itemId):
                     if let item = Item.samples.first(where: { $0.id == itemId }) {
-                        HomeItemDetailView(
-                            item: item,
-                            onPop: {
-                                path.removeLast()
-                            }
-                        )
+                        HomeItemDetailView(item: item)
                     }
                 }
             }

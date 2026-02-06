@@ -7,10 +7,11 @@ import SwiftUI
 
 /// 設定詳細画面
 ///
-/// 原則10: pushされた画面は、同じNavigationStackが閉じる
+/// dismiss は「現在の文脈を終了したい」という意図の表明。
+/// NavigationStack 内では pop、Modal 内では dismiss として動作する。
 struct SettingsDetailView: View {
     let title: String
-    let onPop: () -> Void
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         VStack(spacing: 24) {
@@ -23,7 +24,7 @@ struct SettingsDetailView: View {
             Spacer()
 
             Button("戻る") {
-                onPop()
+                dismiss()
             }
             .buttonStyle(.bordered)
         }
@@ -35,9 +36,6 @@ struct SettingsDetailView: View {
 
 #Preview {
     NavigationStack {
-        SettingsDetailView(
-            title: "アカウント",
-            onPop: {}
-        )
+        SettingsDetailView(title: "アカウント")
     }
 }

@@ -26,12 +26,7 @@ struct SettingsRootView: View {
             .navigationDestination(for: SettingsRoute.self) { route in
                 switch route {
                 case .detail(let title):
-                    SettingsDetailView(
-                        title: title,
-                        onPop: {
-                            path.removeLast()
-                        }
-                    )
+                    SettingsDetailView(title: title)
                 }
             }
         }
