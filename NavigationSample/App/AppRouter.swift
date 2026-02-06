@@ -1,18 +1,18 @@
 //
-//  AppState.swift
+//  AppRouter.swift
 //  NavigationSample
 //
 
 import SwiftUI
 
-/// アプリ全体の状態管理
+/// アプリ全体のルーティングを管理
 ///
 /// 原則3: Push用の状態とModal用の状態は分離する
 /// - Tab選択状態
 /// - App全体のModal状態
 @MainActor
 @Observable
-final class AppState {
+final class AppRouter {
     /// 選択中のタブ
     var selectedTab: Tab = .home
 
@@ -28,7 +28,7 @@ final class AppState {
 
 // MARK: - Event Handling
 
-extension AppState {
+extension AppRouter {
     /// Home Feature からのイベントを処理
     func handle(_ event: HomeEvent) {
         switch event {

@@ -10,28 +10,28 @@ import SwiftUI
 /// 原則6: 構造的にNavigationStackが複数存在してもよいが、
 /// 同時に有効なものは1つにする
 struct MainTabView: View {
-    @Bindable var appState: AppState
+    @Bindable var appRouter: AppRouter
 
     var body: some View {
-        TabView(selection: $appState.selectedTab) {
-            HomeRootView(onEvent: appState.handle)
+        TabView(selection: $appRouter.selectedTab) {
+            HomeRootView(onEvent: appRouter.handle)
                 .tabItem {
                     Label("ホーム", systemImage: "house")
                 }
-                .tag(AppState.Tab.home)
+                .tag(AppRouter.Tab.home)
 
-            SettingsRootView(onEvent: appState.handle)
+            SettingsRootView(onEvent: appRouter.handle)
                 .tabItem {
                     Label("設定", systemImage: "gear")
                 }
-                .tag(AppState.Tab.settings)
+                .tag(AppRouter.Tab.settings)
         }
-        .sheet(item: $appState.modal) { modal in
-            AppModalRoot(modal: modal, onEvent: appState.handle)
+        .sheet(item: $appRouter.modal) { modal in
+            AppModalRoot(modal: modal, onEvent: appRouter.handle)
         }
     }
 }
 
 #Preview {
-    MainTabView(appState: AppState())
+    MainTabView(appRouter: AppRouter())
 }

@@ -9,12 +9,12 @@ import SwiftUI
 
 @main
 struct NavigationSampleApp: App {
-    /// アプリ全体の状態
-    @State private var appState = AppState()
+    /// アプリ全体のルーター
+    @State private var appRouter = AppRouter()
 
     var body: some Scene {
         WindowGroup {
-            MainTabView(appState: appState)
+            MainTabView(appRouter: appRouter)
         }
     }
 }
