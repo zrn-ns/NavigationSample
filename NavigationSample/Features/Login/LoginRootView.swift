@@ -9,38 +9,26 @@ import SwiftUI
 ///
 /// 手段5: ModalはFeatureとしてRootViewを持たせる
 struct LoginRootView: View {
-    /// Feature内のpush遷移状態
-    @State private var path: [LoginRoute] = []
+    /// Feature内のルーティング管理
+    @State private var router = LoginRouter()
 
     /// App層へのイベント通知
     let onEvent: (LoginEvent) -> Void
 
     var body: some View {
-        NavigationStack(path: $path) {
-            LoginStartView(
-                onNavigate: { route in
-                    path.append(route)
-                },
-                onCancel: {
-                    onEvent(.cancelled)
+        NavigationStack(path: $router.path) {
+            LoginStartView(router: router)
+                .navigationDestination(for: LoginRoute.self) { route in
+                    switch route {
+                    case .complete:
+                        LoginCompleteView(router: router)
+                    case .failure:
+                        LoginFailureView(router: router)
+                    }
                 }
-            )
-            .navigationDestination(for: LoginRoute.self) { route in
-                switch route {
-                case .complete:
-                    LoginCompleteView(
-                        onComplete: {
-                            onEvent(.completed)
-                        }
-                    )
-                case .failure:
-                    LoginFailureView(
-                        onBack: {
-                            path.removeLast()
-                        }
-                    )
-                }
-            }
+        }
+        .onAppear {
+            router.onEvent = onEvent
         }
     }
 }
