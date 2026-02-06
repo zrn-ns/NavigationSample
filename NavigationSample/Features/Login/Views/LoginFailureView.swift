@@ -7,7 +7,7 @@ import SwiftUI
 
 /// ログイン失敗画面
 struct LoginFailureView: View {
-    let onBack: () -> Void
+    let router: LoginRouter
 
     var body: some View {
         VStack(spacing: 24) {
@@ -27,7 +27,7 @@ struct LoginFailureView: View {
             Spacer()
 
             Button {
-                onBack()
+                router.goBack()
             } label: {
                 Text("戻る")
                     .frame(maxWidth: .infinity)
@@ -44,6 +44,6 @@ struct LoginFailureView: View {
 
 #Preview {
     NavigationStack {
-        LoginFailureView(onBack: {})
+        LoginFailureView(router: LoginRouter())
     }
 }

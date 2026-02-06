@@ -9,7 +9,7 @@ import SwiftUI
 ///
 /// 原則12: Modal内の処理結果は「閉じる命令」ではなく「イベント」として返す
 struct LoginCompleteView: View {
-    let onComplete: () -> Void
+    let router: LoginRouter
 
     var body: some View {
         VStack(spacing: 24) {
@@ -28,7 +28,7 @@ struct LoginCompleteView: View {
             Spacer()
 
             Button {
-                onComplete()
+                router.sendEvent(.completed)
             } label: {
                 Text("閉じる")
                     .frame(maxWidth: .infinity)
@@ -45,6 +45,6 @@ struct LoginCompleteView: View {
 
 #Preview {
     NavigationStack {
-        LoginCompleteView(onComplete: {})
+        LoginCompleteView(router: LoginRouter())
     }
 }

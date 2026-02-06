@@ -9,8 +9,7 @@ import SwiftUI
 ///
 /// 原則9: Viewは遷移の決定権を持たない
 struct LoginStartView: View {
-    let onNavigate: (LoginRoute) -> Void
-    let onCancel: () -> Void
+    let router: LoginRouter
 
     @State private var email = ""
     @State private var password = ""
@@ -39,9 +38,9 @@ struct LoginStartView: View {
             VStack(spacing: 12) {
                 Button {
                     if email.isEmpty && password.isEmpty {
-                        onNavigate(.failure)
+                        router.navigate(to: .failure)
                     } else {
-                        onNavigate(.complete)
+                        router.navigate(to: .complete)
                     }
                 } label: {
                     Text("ログイン")
@@ -50,7 +49,7 @@ struct LoginStartView: View {
                 .buttonStyle(.borderedProminent)
 
                 Button("キャンセル") {
-                    onCancel()
+                    router.sendEvent(.cancelled)
                 }
                 .buttonStyle(.bordered)
             }
@@ -64,9 +63,6 @@ struct LoginStartView: View {
 
 #Preview {
     NavigationStack {
-        LoginStartView(
-            onNavigate: { _ in },
-            onCancel: {}
-        )
+        LoginStartView(router: LoginRouter())
     }
 }
