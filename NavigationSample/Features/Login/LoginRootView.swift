@@ -33,6 +33,12 @@ struct LoginRootView: View {
                             onEvent(.completed)
                         }
                     )
+                case .failure:
+                    LoginFailureView(
+                        onBack: {
+                            path.removeLast()
+                        }
+                    )
                 }
             }
         }

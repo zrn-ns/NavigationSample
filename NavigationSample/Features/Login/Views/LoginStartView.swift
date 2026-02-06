@@ -38,8 +38,11 @@ struct LoginStartView: View {
 
             VStack(spacing: 12) {
                 Button {
-                    // ログイン処理（サンプルなので即座に成功）
-                    onNavigate(.complete)
+                    if email.isEmpty && password.isEmpty {
+                        onNavigate(.failure)
+                    } else {
+                        onNavigate(.complete)
+                    }
                 } label: {
                     Text("ログイン")
                         .frame(maxWidth: .infinity)

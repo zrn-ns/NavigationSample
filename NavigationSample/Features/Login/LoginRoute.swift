@@ -10,4 +10,5 @@ import Foundation
 /// 原則1: NavigationStack（push）は同一Feature内に限定する
 enum LoginRoute: Hashable {
     case complete
+    case failure
 }
