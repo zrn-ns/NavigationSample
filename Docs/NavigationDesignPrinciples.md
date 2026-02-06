@@ -188,8 +188,9 @@ View は遷移の決定権を持たない
 ### 原則10
 push された画面は、同じ NavigationStack が閉じる
 
-- pop は path 操作として表現する
-- View 内で dismiss / pop を直接呼ばない
+- `@Environment(\.dismiss)` は「文脈を終了したい」という意図の表明として使用可能
+- SwiftUI が文脈に応じて適切な方法（NavigationStack 内では pop、Modal では dismiss）を決定する
+- View は「どのように閉じるか」を知らず、フレームワークに委ねる
 
 ---
 
@@ -322,15 +323,34 @@ func handle(_ event: HomeEvent) {
 ### 手段7
 遷移を指示するコードは状態を書き換えるだけにする
 
-| 遷移の意味 | 書くコード |
-|---|---|
-| Feature 内 push | `path.append(route)` |
-| Feature 内 pop | `path.removeLast()` |
-| Feature 内 modal | `modal = .xxx` |
-| modal dismiss | `modal = nil` |
-| Feature 跨ぎ | `send(Event)` |
-| App modal | `appModal = .xxx` |
-| 上位 push | `appPath.append(route)` |
+| 遷移の意味 | 書くコード | 実行場所 |
+|---|---|---|
+| Feature 内 push | `path.append(route)` | RootView |
+| Feature 内 pop | `path.removeLast()` | RootView |
+| Feature 内 modal | `modal = .xxx` | RootView |
+| modal dismiss | `modal = nil` | RootView |
+| Feature 跨ぎ | `send(Event)` | View |
+| App modal | `appModal = .xxx` | App層 |
+| 上位 push | `appPath.append(route)` | App層 |
+| 文脈終了の意図表明 | `dismiss()` | View |
+
+**補足: `@Environment(\.dismiss)` について**
+
+View が「現在の文脈を終了したい」という意図を表明する場合、`@Environment(\.dismiss)` を使用する。
+SwiftUI が文脈に応じて適切な方法（NavigationStack 内では pop、Modal では dismiss）を決定するため、
+View は具体的な終了方法を知る必要がない。
+
+```swift
+struct DetailView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Button("戻る") {
+            dismiss()  // 文脈終了の意図を表明
+        }
+    }
+}
+```
 
 ---
 
