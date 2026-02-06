@@ -367,22 +367,74 @@ struct DetailView: View {
 
 ### 課題1: NavigationPath vs [Route] の選択基準
 
-型安全な `[Route]` と型消去された `NavigationPath` の使い分け指針が必要。
+**ステータス:** 🟢 解決済み
+
+#### 結論
+
+**原則として `[Route]` を使用する。`NavigationPath` は例外的なケースのみ。**
+
+#### 技術的比較
+
+| 観点 | `[Route]` | `NavigationPath` |
+|------|-----------|------------------|
+| 型安全性 | ✅ コンパイル時チェック | ❌ ランタイムのみ |
+| Feature 境界の強制 | ✅ 型エラーで防止 | ❌ 防止不可 |
+| 状態復元 | ✅ Codable で直接対応 | △ CodableRepresentation 経由 |
+| 網羅性チェック | ✅ switch で強制 | ❌ 不可 |
+| 複数型の混在 | ❌ 単一型に限定 | ✅ 可能 |
+
+#### 設計原則との整合性
+
+- **原則1**「NavigationStack（push）は同一 Feature 内に限定する」→ `[Route]` が完全適合
+- **原則5**「Route は Feature 境界を越えない」→ `[Route]` なら型システムで強制可能
+- Feature 境界を越える遷移は Modal / Tab / Event で対応するため、複数型混在の必要がない
+
+#### 選択フローチャート
+
+```
+遷移の種類を判定
+    │
+    ├─ 単一 Feature 内の遷移
+    │   └─→ [Route] を使用
+    │
+    ├─ Feature 間遷移
+    │   └─→ Modal / Tab / Event で対応（[Route] を維持）
+    │
+    └─ App 層で統合的なスタックが必要（例外的）
+        └─→ NavigationPath を検討
+```
+
+#### NavigationPath を使用するケース（例外的）
+
+以下のような特殊なケースでのみ `NavigationPath` を検討する：
+
+1. **App 層での統合ナビゲーション**
+   - オンボーディングフロー等、複数 Feature を順に表示する必要がある場合
+   - ただし、Modal で代替できないか先に検討すること
+
+2. **動的な画面構成**
+   - CMS 連携等、実行時に画面構成が決まる場合
+   - A/B テストで画面フローが変わる場合
+
+3. **Deep Linking の複雑な復元**
+   - 外部 URL から複数階層の状態を復元する必要がある場合
+   - ただし、大抵は Feature 単位の `[Route]` で対応可能
+
+#### 本プロジェクトの決定
+
+**全 Feature で `[Route]` を採用し、`NavigationPath` は使用しない。**
 
 ```swift
-// 型安全だが単一型に限定
+// ✅ 推奨: 型安全な [Route]
 @State private var path: [HomeRoute] = []
 
-// 複数型を混在可能だが型安全性は低下
+// ❌ 使用しない: 型消去された NavigationPath
 @State private var path = NavigationPath()
 ```
 
-**検討ポイント:**
-- 単一 Feature 内では `[Route]` を推奨？
-- 複数 Feature を横断する場合は `NavigationPath` が必要？
-- Codable 対応による状態復元との関係
-
-**ステータス:** 🔴 未検討
+理由：
+- 本プロジェクトの全遷移は Feature 内 push または Feature 間の Modal/Tab で実現可能
+- 型安全性と設計原則の整合性を優先
 
 ---
 
@@ -452,4 +504,5 @@ UIKit と SwiftUI が混在する環境での状態管理パターンを明確�
 
 | 日付 | 内容 |
 |------|------|
+| 2026-02-06 | 課題1「NavigationPath vs [Route] の選択基準」を解決済みに更新 |
 | 2026-02-05 | 初版作成、課題セクション追加 |
