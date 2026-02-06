@@ -8,12 +8,11 @@ import SwiftUI
 /// ホーム画面（アイテム一覧）
 ///
 /// 原則9: Viewは遷移の決定権を持たない
-/// - router: Feature内遷移用（バケツリレー）
-/// - onEvent: Feature外遷移の意図を表明
+/// - router: Feature内遷移および App 層イベント通知（バケツリレー）
 struct HomeView: View {
     let items: [Item]
+    /// Feature 内ルーティング（バケツリレー）
     let router: HomeRouter
-    let onEvent: (HomeEvent) -> Void
 
     var body: some View {
         List {
@@ -38,11 +37,11 @@ struct HomeView: View {
 
             Section {
                 Button("ログインが必要な機能") {
-                    onEvent(.requireLogin)
+                    router.sendEvent(.requireLogin)
                 }
 
                 Button("設定を開く") {
-                    onEvent(.openSettings)
+                    router.sendEvent(.openSettings)
                 }
             } header: {
                 Text("アクション")
@@ -56,8 +55,7 @@ struct HomeView: View {
     NavigationStack {
         HomeView(
             items: Item.samples,
-            router: HomeRouter(),
-            onEvent: { _ in }
+            router: HomeRouter()
         )
     }
 }

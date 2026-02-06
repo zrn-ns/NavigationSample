@@ -22,8 +22,7 @@ struct HomeRootView: View {
         NavigationStack(path: $router.path) {
             HomeView(
                 items: Item.samples,
-                router: router,
-                onEvent: onEvent
+                router: router
             )
             .navigationDestination(for: HomeRoute.self) { route in
                 switch route {
@@ -32,6 +31,11 @@ struct HomeRootView: View {
                         HomeItemDetailView(
                             item: item,
                             router: router  // バケツリレー
+                        )
+                    } else {
+                        ContentUnavailableView(
+                            "アイテムが見つかりません",
+                            systemImage: "questionmark.circle"
                         )
                     }
 
@@ -42,6 +46,11 @@ struct HomeRootView: View {
                             item: item,
                             relatedItems: relatedItems,
                             router: router  // バケツリレー
+                        )
+                    } else {
+                        ContentUnavailableView(
+                            "アイテムが見つかりません",
+                            systemImage: "questionmark.circle"
                         )
                     }
                 }
@@ -63,6 +72,9 @@ struct HomeRootView: View {
                     )
                 }
             }
+        }
+        .onAppear {
+            router.onEvent = onEvent
         }
     }
 }

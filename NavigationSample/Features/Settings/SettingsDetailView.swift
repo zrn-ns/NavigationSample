@@ -11,6 +11,8 @@ import SwiftUI
 /// NavigationStack 内では pop、Modal 内では dismiss として動作する。
 struct SettingsDetailView: View {
     let title: String
+    /// Feature 内ルーティング（バケツリレー、将来の拡張用）
+    let router: SettingsRouter
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -36,6 +38,6 @@ struct SettingsDetailView: View {
 
 #Preview {
     NavigationStack {
-        SettingsDetailView(title: "アカウント")
+        SettingsDetailView(title: "アカウント", router: SettingsRouter())
     }
 }

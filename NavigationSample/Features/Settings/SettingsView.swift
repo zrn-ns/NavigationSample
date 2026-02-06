@@ -9,8 +9,8 @@ import SwiftUI
 ///
 /// 原則9: Viewは遷移の決定権を持たない
 struct SettingsView: View {
-    let onNavigate: (SettingsRoute) -> Void
-    let onEvent: (SettingsEvent) -> Void
+    /// Feature 内ルーティング（バケツリレー）
+    let router: SettingsRouter
 
     private let settingsItems = [
         "アカウント",
@@ -24,7 +24,7 @@ struct SettingsView: View {
             Section {
                 ForEach(settingsItems, id: \.self) { item in
                     Button {
-                        onNavigate(.detail(item))
+                        router.navigate(to: .detail(item))
                     } label: {
                         HStack {
                             Text(item)
@@ -41,7 +41,7 @@ struct SettingsView: View {
 
             Section {
                 Button("ホームに戻る") {
-                    onEvent(.openHome)
+                    router.sendEvent(.openHome)
                 }
             } header: {
                 Text("アクション")
@@ -53,9 +53,6 @@ struct SettingsView: View {
 
 #Preview {
     NavigationStack {
-        SettingsView(
-            onNavigate: { _ in },
-            onEvent: { _ in }
-        )
+        SettingsView(router: SettingsRouter())
     }
 }

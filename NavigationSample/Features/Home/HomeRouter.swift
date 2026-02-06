@@ -18,6 +18,9 @@ final class HomeRouter {
     /// Feature 内の modal 状態
     var modal: HomeModal?
 
+    /// App 層へのイベント通知
+    var onEvent: ((HomeEvent) -> Void)?
+
     /// push 遷移
     func navigate(to route: HomeRoute) {
         path.append(route)
@@ -31,5 +34,10 @@ final class HomeRouter {
     /// モーダルを閉じる
     func dismissModal() {
         modal = nil
+    }
+
+    /// App 層イベントを発火
+    func sendEvent(_ event: HomeEvent) {
+        onEvent?(event)
     }
 }
