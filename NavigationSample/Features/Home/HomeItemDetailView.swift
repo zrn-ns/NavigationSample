@@ -11,6 +11,8 @@ import SwiftUI
 /// NavigationStack 内では pop、Modal 内では dismiss として動作する。
 struct HomeItemDetailView: View {
     let item: Item
+    /// Feature 内の push 遷移
+    let onNavigate: (HomeRoute) -> Void
     /// 編集モーダルを表示したいという意図の表明
     let onShowEdit: () -> Void
     @Environment(\.dismiss) private var dismiss
@@ -30,6 +32,11 @@ struct HomeItemDetailView: View {
             Spacer()
 
             VStack(spacing: 12) {
+                Button("関連アイテムを見る") {
+                    onNavigate(.itemRelated(item.id))
+                }
+                .buttonStyle(.bordered)
+
                 Button("編集") {
                     onShowEdit()
                 }
@@ -51,6 +58,7 @@ struct HomeItemDetailView: View {
     NavigationStack {
         HomeItemDetailView(
             item: Item.samples[0],
+            onNavigate: { _ in },
             onShowEdit: {}
         )
     }

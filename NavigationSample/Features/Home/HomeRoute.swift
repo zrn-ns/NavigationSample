@@ -11,4 +11,5 @@ import Foundation
 /// 手段1: Feature単位でRouteを定義する
 enum HomeRoute: Hashable {
     case itemDetail(Item.ID)
+    case itemRelated(Item.ID)
 }
