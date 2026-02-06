@@ -9,13 +9,8 @@ import Foundation
 ///
 /// 原則8: ModalRoute は「文脈のスコープ」で定義する
 /// - Feature 文脈 → FeatureModal
-enum HomeModal: Identifiable {
+enum HomeModal: Identifiable, Hashable {
     case edit(Item.ID)
 
-    var id: String {
-        switch self {
-        case .edit(let itemId):
-            return "edit-\(itemId)"
-        }
-    }
+    var id: Self { self }
 }
