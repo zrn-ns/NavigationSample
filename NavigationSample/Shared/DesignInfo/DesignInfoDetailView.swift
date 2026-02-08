@@ -21,6 +21,9 @@ struct DesignInfoDetailView: View {
         }
         .navigationTitle("設計情報")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: ScreenDesignInfo.Principle.self) { principle in
+            PrincipleDetailView(principleInfo: PrincipleInfoProvider.info(for: principle))
+        }
     }
 
     // MARK: - Sections
@@ -85,7 +88,8 @@ struct DesignInfoDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             sectionHeader("適用原則")
 
-            let grouped = Dictionary(grouping: info.appliedPrinciples) { $0.category }
+            let principleInfos = info.appliedPrinciples.map { PrincipleInfoProvider.info(for: $0) }
+            let grouped = Dictionary(grouping: principleInfos) { $0.category }
             let sortedCategories = ["状態駆動", "文脈構造", "Feature境界", "状態分離", "責務分離", "結果伝達"]
 
             ForEach(sortedCategories, id: \.self) { category in
@@ -96,15 +100,24 @@ struct DesignInfoDetailView: View {
                             .fontWeight(.semibold)
                             .foregroundStyle(.secondary)
 
-                        ForEach(principles, id: \.self) { principle in
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(principle.rawValue)
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                Text(principle.explanation)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                        ForEach(principles) { principleInfo in
+                            NavigationLink(value: principleInfo.principle) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(principleInfo.principle.rawValue)
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                        Text(principleInfo.explanation)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                        .foregroundStyle(.tertiary)
+                                }
                             }
+                            .buttonStyle(.plain)
                             .padding(.vertical, 4)
                         }
                     }
