@@ -24,6 +24,9 @@ struct DesignInfoDetailView: View {
         .navigationDestination(for: ScreenDesignInfo.Principle.self) { principle in
             PrincipleDetailView(principleInfo: PrincipleInfoProvider.info(for: principle))
         }
+        .navigationDestination(for: PracticeInfo.self) { practice in
+            PracticeDetailView(practiceInfo: practice)
+        }
     }
 
     // MARK: - Sections

@@ -31,9 +31,6 @@ struct PrincipleDetailView: View {
         }
         .navigationTitle(principleInfo.principle.rawValue)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: PracticeInfo.self) { practice in
-            PracticeDetailView(practiceInfo: practice)
-        }
     }
 
     // MARK: - Sections
