@@ -28,20 +28,18 @@ final class MainTabBarController: UITabBarController {
     }
 
     private func setupTabs() {
-        // Home Tab
-        let homeRootView = HomeRootView(onEvent: { [weak self] event in
-            self?.coordinator?.handle(event)
-        })
-        let homeVC = UIHostingController(rootView: homeRootView)
-        homeVC.tabBarItem = UITabBarItem(title: "ホーム", image: UIImage(systemName: "house"), tag: 0)
+        // Home Tab (UIKit ベースのグリッド)
+        let homeNavController = UINavigationController()
+        homeNavController.tabBarItem = UITabBarItem(title: "ホーム", image: UIImage(systemName: "heart.circle"), tag: 0)
+        coordinator?.setupUserGridCoordinator(navigationController: homeNavController)
 
-        // Settings Tab
+        // Settings Tab (SwiftUI ベース)
         let settingsRootView = SettingsRootView(onEvent: { [weak self] event in
             self?.coordinator?.handle(event)
         })
         let settingsVC = UIHostingController(rootView: settingsRootView)
         settingsVC.tabBarItem = UITabBarItem(title: "設定", image: UIImage(systemName: "gear"), tag: 1)
 
-        viewControllers = [homeVC, settingsVC]
+        viewControllers = [homeNavController, settingsVC]
     }
 }

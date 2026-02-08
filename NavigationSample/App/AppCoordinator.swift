@@ -15,6 +15,9 @@ final class AppCoordinator {
     private let window: UIWindow
     private var tabBarController: MainTabBarController?
 
+    /// Home タブの Coordinator（UIKit グリッド → SwiftUI 詳細への遷移を管理）
+    private var userGridCoordinator: UserGridCoordinator?
+
     /// App 層の Modal 状態
     var currentModal: AppModal?
 
@@ -29,14 +32,17 @@ final class AppCoordinator {
         window.makeKeyAndVisible()
     }
 
-    // MARK: - Event Handling
-
-    func handle(_ event: HomeEvent) {
-        switch event {
-        case .openSettings:
-            tabBarController?.selectedIndex = 1
-        }
+    /// Home タブ用の Coordinator を設定
+    func setupUserGridCoordinator(navigationController: UINavigationController) {
+        let coordinator = UserGridCoordinator(
+            navigationController: navigationController,
+            appCoordinator: self
+        )
+        self.userGridCoordinator = coordinator
+        coordinator.start()
     }
+
+    // MARK: - Event Handling
 
     func handle(_ event: SettingsEvent) {
         switch event {
