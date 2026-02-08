@@ -50,6 +50,12 @@ final class UserGridViewController: UIViewController {
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+
+        let designInfoButton = DesignInfoButton(
+            info: ScreenDesignInfoProvider.userGrid,
+            presentingViewController: self
+        )
+        designInfoButton.addToViewController(self)
     }
 
     private func createLayout() -> UICollectionViewLayout {

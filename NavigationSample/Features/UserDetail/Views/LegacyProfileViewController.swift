@@ -73,6 +73,12 @@ final class LegacyProfileViewController: UIViewController {
             stackView.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 16),
             stackView.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -16)
         ])
+
+        let designInfoButton = DesignInfoButton(
+            info: ScreenDesignInfoProvider.legacyProfile,
+            presentingViewController: self
+        )
+        designInfoButton.addToViewController(self)
     }
 
     private func setupNavigationBar() {
@@ -136,5 +142,11 @@ final class LegacyProfileSecondViewController: UIViewController {
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+
+        let designInfoButton = DesignInfoButton(
+            info: ScreenDesignInfoProvider.legacyProfileSecond,
+            presentingViewController: self
+        )
+        designInfoButton.addToViewController(self)
     }
 }
