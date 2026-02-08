@@ -127,6 +127,12 @@ final class SwipeDismissalInteractor: UIPercentDrivenInteractiveTransition {
     private(set) var isInteracting = false
     private weak var viewController: UIViewController?
 
+    /// NavigationStack の root 画面かどうかを判定するクロージャ
+    ///
+    /// Coordinator が router.path.isEmpty を遅延参照するクロージャを設定する。
+    /// root 画面でのみ dismiss ジェスチャーを許可し、pushed 画面では抑制する。
+    var isAtNavigationRoot: () -> Bool = { true }
+
     /// 対象の VC にスワイプジェスチャーを追加する
     func attach(to viewController: UIViewController) {
         self.viewController = viewController
@@ -171,19 +177,6 @@ final class SwipeDismissalInteractor: UIPercentDrivenInteractiveTransition {
             break
         }
     }
-
-    /// VC の子階層から UINavigationController を探す
-    private func findNavigationController(in viewController: UIViewController) -> UINavigationController? {
-        for child in viewController.children {
-            if let nav = child as? UINavigationController {
-                return nav
-            }
-            if let found = findNavigationController(in: child) {
-                return found
-            }
-        }
-        return nil
-    }
 }
 
 // MARK: - UIGestureRecognizerDelegate
@@ -195,23 +188,9 @@ extension SwipeDismissalInteractor: UIGestureRecognizerDelegate {
 
         let velocity = pan.velocity(in: view)
         // 右方向かつ水平な操作のみ受け付ける
-        return velocity.x > 0 && abs(velocity.x) > abs(velocity.y)
-    }
+        guard velocity.x > 0 && abs(velocity.x) > abs(velocity.y) else { return false }
 
-    /// NavigationStack 内部の pop ジェスチャーを優先させる
-    ///
-    /// interactivePopGestureRecognizer のインスタンス比較で判定する。
-    /// - root 画面: interactivePopGestureRecognizer が fail → dismiss ジェスチャーが発火
-    /// - pushed 画面: interactivePopGestureRecognizer が succeed → dismiss は発火しない
-    func gestureRecognizer(
-        _ gestureRecognizer: UIGestureRecognizer,
-        shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer
-    ) -> Bool {
-        if let vc = viewController,
-           let navController = findNavigationController(in: vc),
-           otherGestureRecognizer === navController.interactivePopGestureRecognizer {
-            return true
-        }
-        return false
+        // pushed 画面では dismiss を抑制し、NavigationStack の pop に任せる
+        return isAtNavigationRoot()
     }
 }
