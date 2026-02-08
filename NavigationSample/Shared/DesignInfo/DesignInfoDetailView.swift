@@ -31,6 +31,11 @@ struct DesignInfoDetailView: View {
                 .font(.title2)
                 .fontWeight(.bold)
 
+            Text(info.rootViewName)
+                .font(.subheadline)
+                .fontDesign(.monospaced)
+                .foregroundStyle(.secondary)
+
             HStack(spacing: 12) {
                 Label(info.framework.rawValue, systemImage: frameworkIcon)
                     .font(.caption)

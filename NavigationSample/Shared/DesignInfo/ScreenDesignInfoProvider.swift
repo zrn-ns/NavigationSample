@@ -15,6 +15,7 @@ enum ScreenDesignInfoProvider {
         screenName: "ユーザグリッド (Home)",
         framework: .uiKit,
         layer: .feature,
+        rootViewName: "UserGridViewController",
         patterns: [.patternB],
         appliedPrinciples: [.s1, .s2, .r1, .r2, .e2],
         description: """
@@ -31,6 +32,7 @@ enum ScreenDesignInfoProvider {
         screenName: "ユーザ詳細",
         framework: .swiftUI,
         layer: .view,
+        rootViewName: "UserDetailRootView",
         patterns: [.featureRoot, .featurePush, .featureModal],
         appliedPrinciples: [.s1, .s2, .c1, .c2, .f1, .p1, .r1, .r2],
         description: """
@@ -45,6 +47,7 @@ enum ScreenDesignInfoProvider {
         screenName: "写真一覧",
         framework: .swiftUI,
         layer: .view,
+        rootViewName: "UserPhotoListView",
         patterns: [.featurePush],
         appliedPrinciples: [.s1, .s2, .f1, .f3, .r1],
         description: """
@@ -59,6 +62,7 @@ enum ScreenDesignInfoProvider {
         screenName: "写真詳細",
         framework: .swiftUI,
         layer: .view,
+        rootViewName: "UserPhotoDetailView",
         patterns: [.featurePush],
         appliedPrinciples: [.s1, .s2, .f1, .f3, .r1],
         description: """
@@ -72,6 +76,7 @@ enum ScreenDesignInfoProvider {
         screenName: "レガシープロフィール (1画面目)",
         framework: .uiKit,
         layer: .view,
+        rootViewName: "LegacyProfileViewController",
         patterns: [.patternA],
         appliedPrinciples: [.c1, .c3, .p2, .r2, .e1],
         description: """
@@ -86,6 +91,7 @@ enum ScreenDesignInfoProvider {
         screenName: "レガシープロフィール (2画面目)",
         framework: .uiKit,
         layer: .view,
+        rootViewName: "LegacyProfileSecondViewController",
         patterns: [.patternA],
         appliedPrinciples: [.c1, .c3, .f1, .r2],
         description: """
@@ -102,6 +108,7 @@ enum ScreenDesignInfoProvider {
         screenName: "設定",
         framework: .swiftUI,
         layer: .view,
+        rootViewName: "SettingsRootView",
         patterns: [.featureRoot, .featurePush],
         appliedPrinciples: [.s1, .s2, .c1, .c2, .f1, .p1, .r1, .e2],
         description: """
@@ -116,6 +123,7 @@ enum ScreenDesignInfoProvider {
         screenName: "設定詳細",
         framework: .swiftUI,
         layer: .view,
+        rootViewName: "SettingsDetailView",
         patterns: [.featurePush],
         appliedPrinciples: [.s1, .s2, .f1, .f3, .r1, .r2],
         description: """
@@ -132,6 +140,7 @@ enum ScreenDesignInfoProvider {
         screenName: "ログイン開始",
         framework: .swiftUI,
         layer: .view,
+        rootViewName: "LoginRootView",
         patterns: [.featureRoot, .featurePush],
         appliedPrinciples: [.s1, .s2, .c1, .c3, .p2, .r1, .e1, .e2],
         description: """
@@ -145,6 +154,7 @@ enum ScreenDesignInfoProvider {
         screenName: "ログイン完了",
         framework: .swiftUI,
         layer: .view,
+        rootViewName: "LoginCompleteView",
         patterns: [.featurePush],
         appliedPrinciples: [.s1, .s2, .f1, .r1, .e1, .e2],
         description: """
@@ -159,6 +169,7 @@ enum ScreenDesignInfoProvider {
         screenName: "ログイン失敗",
         framework: .swiftUI,
         layer: .view,
+        rootViewName: "LoginFailureView",
         patterns: [.featurePush],
         appliedPrinciples: [.s1, .s2, .f1, .r1],
         description: """

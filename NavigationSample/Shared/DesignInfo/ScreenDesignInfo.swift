@@ -11,6 +11,7 @@ struct ScreenDesignInfo: Identifiable {
     let screenName: String
     let framework: Framework
     let layer: Layer
+    let rootViewName: String
     let patterns: [Pattern]
     let appliedPrinciples: [Principle]
     let description: String
