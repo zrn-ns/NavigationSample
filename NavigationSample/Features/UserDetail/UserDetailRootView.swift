@@ -39,13 +39,15 @@ struct UserDetailRootView: View {
         .sheet(item: $router.modal) { modal in
             switch modal {
             case .likeSend:
-                LikeSendModalView(
+                LikeSendRootView(
                     user: router.user,
-                    onLikeSent: { type in
-                        router.sendLike(type)
-                    },
-                    onDismiss: {
-                        router.dismissModal()
+                    onEvent: { event in
+                        switch event {
+                        case .liked(let type):
+                            router.sendLike(type)
+                        case .dismissed:
+                            router.dismissModal()
+                        }
                     }
                 )
             }

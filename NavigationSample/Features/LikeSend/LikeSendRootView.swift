@@ -1,27 +1,28 @@
 //
-//  LikeSendModalView.swift
+//  LikeSendRootView.swift
 //  NavigationSample
 //
 
 import SwiftUI
 
-/// いいね送信画面を SwiftUI のセミモーダルで表示するためのラッパー View
+/// LikeSend Feature のエントリポイント
 ///
-/// ## パターン A: SwiftUI から UIKit 画面を modal 表示
-///
-/// - LikeSendViewController を UIViewControllerRepresentable でラップ
-/// - .presentationDetents([.medium]) でセミモーダル表示
-/// - 単画面のため UINavigationController でのラップは不要
-struct LikeSendModalView: View {
+/// 単画面の Feature のため NavigationStack・Router は不要。
+/// UIKit の LikeSendViewController を UIViewControllerRepresentable でラップし、
+/// セミモーダル（.presentationDetents([.medium])）で表示する（パターン A）。
+struct LikeSendRootView: View {
     let user: User
-    let onLikeSent: (LikeType) -> Void
-    let onDismiss: () -> Void
+    let onEvent: (LikeSendEvent) -> Void
 
     var body: some View {
         LikeSendViewControllerRepresentable(
             user: user,
-            onLikeSent: onLikeSent,
-            onDismiss: onDismiss
+            onLikeSent: { type in
+                onEvent(.liked(type: type))
+            },
+            onDismiss: {
+                onEvent(.dismissed)
+            }
         )
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
@@ -31,7 +32,7 @@ struct LikeSendModalView: View {
 // MARK: - UIViewControllerRepresentable
 
 /// LikeSendViewController を SwiftUI でラップ
-struct LikeSendViewControllerRepresentable: UIViewControllerRepresentable {
+private struct LikeSendViewControllerRepresentable: UIViewControllerRepresentable {
     let user: User
     let onLikeSent: (LikeType) -> Void
     let onDismiss: () -> Void
@@ -50,9 +51,8 @@ struct LikeSendViewControllerRepresentable: UIViewControllerRepresentable {
 }
 
 #Preview {
-    LikeSendModalView(
+    LikeSendRootView(
         user: User.samples[0],
-        onLikeSent: { _ in },
-        onDismiss: {}
+        onEvent: { _ in }
     )
 }
