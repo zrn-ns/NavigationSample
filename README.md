@@ -57,11 +57,11 @@ NavigationSample/
 ```
 NavigationSample/
 ├── App/
-│   ├── NavigationSampleApp.swift   # エントリポイント
-│   ├── AppState.swift              # アプリ全体の状態管理
-│   ├── AppModal.swift              # App全体Modal定義
-│   ├── AppModalRoot.swift          # Modalルーティング
-│   └── MainTabView.swift           # TabView管理
+│   ├── AppDelegate.swift           # UIApplicationDelegate
+│   ├── SceneDelegate.swift         # UIWindowSceneDelegate
+│   ├── AppCoordinator.swift        # App層の状態管理
+│   ├── MainTabBarController.swift  # UITabBarController
+│   └── AppModal.swift              # App全体Modal定義
 │
 ├── Features/
 │   ├── Home/

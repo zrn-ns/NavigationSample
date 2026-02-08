@@ -463,14 +463,124 @@ func restore(from url: URL) {
 
 ### 課題3: UIKit との混在パターン
 
-UIKit と SwiftUI が混在する環境での状態管理パターンを明確化する。
+**ステータス:** 🟢 解決済み
 
-**検討ポイント:**
-- `UIHostingController` で SwiftUI をラップする場合の状態管理
-- `UIViewControllerRepresentable` で UIKit をラップする場合
-- UIKit の `UINavigationController` と SwiftUI の `NavigationStack` の共存
+#### 結論
 
-**ステータス:** 🔴 未検討
+**UIKit App 層 + SwiftUI Feature 層**の構成が、UIKit ベースの既存アプリに SwiftUI を導入する際の推奨パターン。
+
+#### 実装パターン
+
+```
+UIKit App
+├── AppDelegate.swift (UIKit)
+├── SceneDelegate.swift (UIKit)
+├── AppCoordinator.swift (UIKit Coordinator)
+├── MainTabBarController.swift (UITabBarController)
+└── Features/
+    ├── Home/ (UIHostingController + SwiftUI NavigationStack)
+    ├── Settings/ (UIHostingController + SwiftUI NavigationStack)
+    └── Login/ (UIHostingController + SwiftUI NavigationStack)
+```
+
+#### 設計原則との整合性
+
+- **原則8「文脈を開始した主体が、文脈を終了させる責務を持つ」**
+  - App 層の UIKit Coordinator が Modal 表示・非表示を管理
+  - Feature 層は Event を上位に委譲するのみ
+
+- **原則6「構造的に NavigationStack が複数存在してもよいが、同時に有効なものは1つにする」**
+  - UITabBarController の各タブが UIHostingController で SwiftUI View をラップ
+  - タブ切り替え時、選択されていないタブの NavigationStack は非アクティブ
+
+#### 実装例
+
+**AppCoordinator（UIKit）:**
+
+```swift
+@MainActor
+final class AppCoordinator {
+    private let window: UIWindow
+    private var tabBarController: MainTabBarController?
+    var currentModal: AppModal?
+
+    func start() {
+        let tabBarController = MainTabBarController(coordinator: self)
+        self.tabBarController = tabBarController
+        window.rootViewController = tabBarController
+        window.makeKeyAndVisible()
+    }
+
+    func handle(_ event: LoginEvent) {
+        switch event {
+        case .completed, .cancelled:
+            dismissModal()
+        }
+    }
+
+    private func presentLogin() {
+        let loginRootView = LoginRootView(onEvent: { [weak self] event in
+            self?.handle(event)
+        })
+        let hostingController = UIHostingController(rootView: loginRootView)
+        hostingController.modalPresentationStyle = .fullScreen
+        tabBarController?.present(hostingController, animated: true)
+        currentModal = .login
+    }
+
+    private func dismissModal() {
+        tabBarController?.dismiss(animated: true)
+        currentModal = nil
+    }
+}
+```
+
+**MainTabBarController（UIKit）:**
+
+```swift
+final class MainTabBarController: UITabBarController {
+    private weak var coordinator: AppCoordinator?
+
+    private func setupTabs() {
+        let homeRootView = HomeRootView(onEvent: { [weak self] event in
+            self?.coordinator?.handle(event)
+        })
+        let homeVC = UIHostingController(rootView: homeRootView)
+        homeVC.tabBarItem = UITabBarItem(title: "ホーム", image: UIImage(systemName: "house"), tag: 0)
+
+        let settingsRootView = SettingsRootView(onEvent: { [weak self] event in
+            self?.coordinator?.handle(event)
+        })
+        let settingsVC = UIHostingController(rootView: settingsRootView)
+        settingsVC.tabBarItem = UITabBarItem(title: "設定", image: UIImage(systemName: "gear"), tag: 1)
+
+        viewControllers = [homeVC, settingsVC]
+    }
+}
+```
+
+#### UIHostingController でラップする際のポイント
+
+1. **SwiftUI View は既存の設計を変更不要**
+   - `onEvent` クロージャで上位に Event を委譲するパターンはそのまま使用可能
+   - Feature 内の NavigationStack も変更不要
+
+2. **状態管理の境界**
+   - UIKit Coordinator: App 層の Modal 状態、Tab 選択状態
+   - SwiftUI Router: Feature 内の path、modal 状態
+
+3. **イベントフロー**
+   - SwiftUI View → Event → UIHostingController → Coordinator → UIKit の遷移処理
+
+#### 本プロジェクトの実装
+
+本プロジェクトは UIKit App 層を採用：
+- `AppDelegate.swift` - UIApplicationDelegate
+- `SceneDelegate.swift` - UIWindowSceneDelegate
+- `AppCoordinator.swift` - App 層の状態管理
+- `MainTabBarController.swift` - UITabBarController
+
+各 Feature（Home, Settings, Login）は SwiftUI のまま維持し、UIHostingController でラップ。
 
 ---
 
@@ -504,5 +614,6 @@ UIKit と SwiftUI が混在する環境での状態管理パターンを明確�
 
 | 日付 | 内容 |
 |------|------|
+| 2026-02-08 | 課題3「UIKit との混在パターン」を解決済みに更新、App 層を UIKit に変更 |
 | 2026-02-06 | 課題1「NavigationPath vs [Route] の選択基準」を解決済みに更新 |
 | 2026-02-05 | 初版作成、課題セクション追加 |
