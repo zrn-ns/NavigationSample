@@ -1,47 +1,121 @@
 # SwiftUI ナビゲーション／Modal 設計 原理原則まとめ
 
 本ドキュメントは、SwiftUI におけるナビゲーションおよび Modal 設計を、
-**原理 → 原則 → 具体的手段** の三層構造で整理したものである。
+**6カテゴリ・15原則** に整理したものである。
 
 API や実装テクニックではなく、
 「なぜそう設計するのか」を再利用可能な形で言語化することを目的とする。
 
 ---
 
-## 原理（Principles）
+## 設計原則一覧
 
-### 原理1
-ナビゲーションは「画面遷移」ではなく「状態遷移」である
+| カテゴリ | コード | 原則名 | 概要 |
+|----------|--------|--------|------|
+| **状態駆動** | S1 | 状態結果原則 | 画面は状態の結果 |
+| | S2 | 意味表現原則 | Route は意味を表す |
+| **文脈構造** | C1 | 単一文脈原則 | 有効な文脈は1つ |
+| | C2 | 階層スコープ原則 | 文脈には階層がある |
+| | C3 | 文脈停止原則 | 切替で元文脈は停止 |
+| **Feature境界** | F1 | Push限定原則 | push は同一 Feature 内 |
+| | F2 | 切断遷移原則 | Feature 跨ぎは文脈切断 |
+| | F3 | Route境界原則 | Route は Feature 内定義 |
+| **状態分離** | P1 | Push/Modal分離原則 | push と modal は別状態 |
+| | P2 | Modalスコープ原則 | Modal は文脈スコープで定義 |
+| **責務分離** | R1 | View無決定権原則 | View は遷移を決定しない |
+| | R2 | 開始者終了原則 | 開始した主体が終了責務 |
+| | R3 | 上位強制終了原則 | 強制終了は上位の責務 |
+| **結果伝達** | E1 | 終了結果原則 | 終了には結果が伴う |
+| | E2 | Event委譲原則 | Feature 間は Event で連携 |
+
+---
+
+## 画面パターン別 適用原則マトリクス
+
+| 画面パターン | 適用原則 |
+|-------------|---------|
+| 全画面共通 | S1, S2 |
+| NavigationStack (push) | C1, C2, F1, P1, R2 |
+| Modal 表示 | C1, C2, C3, P2, R2, E1, E2 |
+| Feature 内遷移 | F1, F3 |
+| Feature 間遷移 | F2, E2 |
+| View 実装 | R1, S2 |
+| RootView 設計 | P1, P2, R2 |
+
+---
+
+## 状態駆動（State-Driven）
+
+### S1: 状態結果原則
+
+**ナビゲーションは「画面遷移」ではなく「状態遷移」である**
 
 - SwiftUI は命令的に画面を遷移させる UI フレームワークではない
 - 「今どの画面が表示されているか」は、状態の結果として決まる
 
----
-
-### 原理2
-表示されている View が属するナビゲーション文脈は常に1つである
-
-- NavigationStack
-- Modal（sheet / fullScreenCover）
-- Tab
-
-これらは **同時に1つの文脈だけが有効** になる
+```swift
+// 状態を変更するだけで画面が変わる
+path.append(.detail(id))  // push
+modal = .login            // modal 表示
+```
 
 ---
 
-### 原理3
-文脈（Context）には階層とスコープがある
+### S2: 意味表現原則
+
+**Route は「画面」ではなく「意味」を表す**
+
+- 状態は「何が起きているか」を直接表現すべきである
+- Bool は「起きている／いない」しか表せない
+- Route は「何が起きているか」を明確に表せる
+
+```swift
+// ❌ 画面名
+case detailView
+
+// ⭕ 意味
+case itemDetail(id: Item.ID)
+```
+
+---
+
+## 文脈構造（Context Structure）
+
+### C1: 単一文脈原則
+
+**表示されている View が属するナビゲーション文脈は常に1つである**
+
+- NavigationStack、Modal（sheet / fullScreenCover）、Tab
+- これらは **同時に1つの文脈だけが有効** になる
+- 構造的に NavigationStack が複数存在してもよいが、同時に有効なものは1つ
+
+```swift
+TabView {
+    // 各タブが独自の NavigationStack を持つ
+    HomeRootView()      // 内部に NavigationStack
+    SettingsRootView()  // 内部に NavigationStack
+}
+// タブ切り替え時、選択されていないタブの NavigationStack は「存在するが非アクティブ」
+```
+
+---
+
+### C2: 階層スコープ原則
+
+**文脈（Context）には階層とスコープがある**
 
 - App 全体の文脈
 - Feature の文脈
 - Feature 内フローの文脈
 
-遷移設計とは、**どの文脈に切り替わるかを定義すること**である
+遷移設計とは、**どの文脈に切り替わるかを定義すること**である。
+状態のスコープは、その意味が通用する範囲に一致すべきである。
 
 ---
 
-### 原理4
-文脈が切り替わると、元の文脈は一時停止される
+### C3: 文脈停止原則
+
+**文脈が切り替わると、元の文脈は一時停止される**
 
 - NavigationStack の path は保持される
 - ただし操作対象ではなくなる
@@ -49,63 +123,20 @@ API や実装テクニックではなく、
 
 ---
 
-### 原理5
-状態は「何が起きているか」を直接表現すべきである
+## Feature境界（Feature Boundary）
 
-- Bool は「起きている／いない」しか表せない
-- Route は「何が起きているか」を表せる
+### F1: Push限定原則
 
----
-
-### 原理6
-状態のスコープは、その意味が通用する範囲に一致すべきである
-
-- 意味が通じない範囲まで状態を共有すると設計が破綻する
-- Route / ModalRoute の定義単位は「意味のスコープ」
-
----
-
-### 原理7
-「画面を閉じる」とは、UI 操作ではなく「文脈を終了させる」ことである
-
-- pop / dismiss は UI 命令ではない
-- 現在の文脈が終了したという状態遷移の結果である
-
----
-
-### 原理8
-文脈を開始した主体が、文脈を終了させる責務を持つ
-
-- Feature が開始した文脈は Feature が閉じる
-- App が開始した文脈は App が閉じる
-
-View 自身が「自分を閉じる」決定権を持ってはならない
-
----
-
-### 原理9
-文脈の終了は、結果（Outcome）を伴うことがある
-
-- 成功
-- キャンセル
-- 失敗
-
-これらは UI ではなく、ドメイン上の意味ある結果である
-
----
-
-## 原則（Rules）
-
-### 原則1
-NavigationStack（push）は同一 Feature 内に限定する
+**NavigationStack（push）は同一 Feature 内に限定する**
 
 - push = 文脈の継続
 - Feature を跨ぐ push は文脈破壊
 
 ---
 
-### 原則2
-Feature を跨ぐ遷移は「文脈の切断」として扱う
+### F2: 切断遷移原則
+
+**Feature を跨ぐ遷移は「文脈の切断」として扱う**
 
 - Tab 切り替え
 - Modal 表示
@@ -113,135 +144,150 @@ Feature を跨ぐ遷移は「文脈の切断」として扱う
 
 ---
 
-### 原則3
-Push 用の状態と Modal 用の状態は分離する
+### F3: Route境界原則
 
-- push：スタック型（`[Route]`）
-- modal：排他的（`Route?`）
-
-同一 state に混在させない
-
----
-
-### 原則4
-Route は「画面」ではなく「意味」を表す
-
-- ❌ DetailView
-- ⭕ ItemDetail(id)
-
----
-
-### 原則5
-Route は Feature 境界を越えない
+**Route は Feature 境界を越えない**
 
 - Feature ごとに Route を定義
 - グローバル Route は最小限
 
----
-
-### 原則6
-構造的に NavigationStack が複数存在してもよいが、
-同時に有効なものは1つにする
-
-- 表示対象として1つだけが有効であることが重要
-
-**具体例: TabView 内の NavigationStack**
-
 ```swift
-TabView {
-    // 各タブが独自の NavigationStack を持つ
-    HomeRootView()      // 内部に NavigationStack
-    SearchRootView()    // 内部に NavigationStack
-    ProfileRootView()   // 内部に NavigationStack
+// Feature 単位で Route を定義
+enum HomeRoute: Hashable {
+    case itemDetail(Item.ID)
+}
+
+enum SettingsRoute: Hashable {
+    case detail(String)
 }
 ```
 
-タブ切り替え時、選択されていないタブの NavigationStack は「存在するが非アクティブ」となる。
+---
 
-**具体例: UITabBarController 内の NavigationStack**
+## 状態分離（State Separation）
+
+### P1: Push/Modal分離原則
+
+**Push 用の状態と Modal 用の状態は分離する**
+
+- push：スタック型（`[Route]`）
+- modal：排他的（`Route?`）
+- 同一 state に混在させない
 
 ```swift
-// UIKit: UITabBarController
-final class MainTabBarController: UITabBarController {
-    private func setupTabs() {
-        // 各タブが UIHostingController で SwiftUI View をラップ
-        viewControllers = [
-            UIHostingController(rootView: HomeRootView(...)),    // 内部に NavigationStack
-            UIHostingController(rootView: SettingsRootView(...)) // 内部に NavigationStack
-        ]
-    }
+@Observable final class FeatureRouter {
+    var path: [FeatureRoute] = []   // push 用
+    var modal: FeatureModal?        // modal 用
 }
 ```
 
-UIKit の UITabBarController でも同様に、選択されていないタブの NavigationStack は非アクティブとなる。
-
 ---
 
-### 原則7
-Modal は「一時的 UI」ではなく「独立した文脈」である
+### P2: Modalスコープ原則
+
+**Modal は「一時的 UI」ではなく「独立した文脈」である**
 
 - dismiss により文脈復帰が起きる
 - 内部に独自の Navigation を持てる
+- ModalRoute は「文脈のスコープ」で定義する
+  - App 文脈 → AppModal
+  - Feature 文脈 → FeatureModal
+  - 画面単位では定義しない
 
 ---
 
-### 原則8
-ModalRoute は「文脈のスコープ」で定義する
+## 責務分離（Responsibility Separation）
 
-- App 文脈 → AppModal
-- Feature 文脈 → FeatureModal
-- 画面単位では定義しない
+### R1: View無決定権原則
 
----
-
-### 原則9
-View は遷移の決定権を持たない
+**View は遷移の決定権を持たない**
 
 - View は「意図」を表明するだけ
 - 遷移の解釈は上位レイヤーの責務
 
----
-
-### 原則10
-push された画面は、同じ NavigationStack が閉じる
-
-- `@Environment(\.dismiss)` は「文脈を終了したい」という意図の表明として使用可能
-- SwiftUI が文脈に応じて適切な方法（NavigationStack 内では pop、Modal では dismiss）を決定する
-- View は「どのように閉じるか」を知らず、フレームワークに委ねる
-
----
-
-### 原則11
-Modal は、それを管理している状態が閉じる
-
-- Modal を開いた state（`ModalRoute?`）を `nil` に戻す
-- ModalView 自身が dismiss を決定しない
+```swift
+// View は意図を表明
+Button("詳細を見る") {
+    router.showDetail(id)  // 「詳細を見たい」という意図
+}
+// Router が遷移方法を決定
+```
 
 ---
 
-### 原則12
-Modal 内の処理結果は「閉じる命令」ではなく「イベント」として返す
+### R2: 開始者終了原則
 
-- ModalView → Result
-- 上位が結果を解釈して閉じる
+**文脈を開始した主体が、文脈を終了させる責務を持つ**
+
+- Feature が開始した文脈は Feature が閉じる
+- App が開始した文脈は App が閉じる
+- push された画面は、同じ NavigationStack が閉じる
+- Modal は、それを管理している状態が閉じる
+
+```swift
+// Modal を開いた state（ModalRoute?）を nil に戻す
+func dismissModal() {
+    modal = nil
+}
+```
+
+**補足: `@Environment(\.dismiss)` について**
+
+`@Environment(\.dismiss)` は「文脈を終了したい」という意図の表明として使用可能。
+SwiftUI が文脈に応じて適切な方法（NavigationStack 内では pop、Modal では dismiss）を決定する。
 
 ---
 
-### 原則13
-文脈を跨ぐ「強制的な終了」は、常に上位レイヤーの責務である
+### R3: 上位強制終了原則
+
+**文脈を跨ぐ「強制的な終了」は、常に上位レイヤーの責務である**
 
 - ログアウト
 - セッション切れ
 - 強制アップデート
 
-Feature が勝手に自分や他 Feature の文脈を破壊しない
+Feature が勝手に自分や他 Feature の文脈を破壊しない。
+
+---
+
+## 結果伝達（Result Communication）
+
+### E1: 終了結果原則
+
+**「画面を閉じる」とは、UI 操作ではなく「文脈を終了させる」ことであり、結果を伴うことがある**
+
+- pop / dismiss は UI 命令ではない
+- 現在の文脈が終了したという状態遷移の結果
+- 成功、キャンセル、失敗など、ドメイン上の意味ある結果
+
+---
+
+### E2: Event委譲原則
+
+**Modal 内の処理結果は「閉じる命令」ではなく「イベント」として返す**
+
+- ModalView → Result
+- 上位が結果を解釈して閉じる
+- Feature 間遷移は Event として上位に委譲
+
+```swift
+enum HomeEvent {
+    case requireLogin
+}
+
+func handle(_ event: HomeEvent) {
+    switch event {
+    case .requireLogin:
+        appModal = .login
+    }
+}
+```
 
 ---
 
 ## 具体的手段（Practices）
 
-### 手段1
-Feature 単位で Route を定義する
+### 手段1: Feature 単位で Route を定義する
 
 ```swift
 enum HomeRoute: Hashable {
@@ -251,8 +297,7 @@ enum HomeRoute: Hashable {
 
 ---
 
-### 手段2
-NavigationStack は Feature の Root にのみ置く
+### 手段2: NavigationStack は Feature の Root にのみ置く
 
 ```swift
 struct HomeRootView: View {
@@ -268,8 +313,7 @@ struct HomeRootView: View {
 
 ---
 
-### 手段3
-Modal 用 Route を別 enum として定義する
+### 手段3: Modal 用 Route を別 enum として定義する
 
 ```swift
 enum AppModal: Identifiable {
@@ -289,8 +333,7 @@ enum AppModal: Identifiable {
 
 ---
 
-### 手段4
-Modal は `item:` ベースで制御する
+### 手段4: Modal は `item:` ベースで制御する
 
 ```swift
 .sheet(item: $appModal) {
@@ -300,8 +343,7 @@ Modal は `item:` ベースで制御する
 
 ---
 
-### 手段5
-Modal は Feature として RootView を持たせる
+### 手段5: Modal は Feature として RootView を持たせる
 
 ```swift
 struct LoginRootView: View {
@@ -317,16 +359,13 @@ struct LoginRootView: View {
 
 ---
 
-### 手段6
-Feature 間遷移は Event として上位に委譲する
+### 手段6: Feature 間遷移は Event として上位に委譲する
 
 ```swift
 enum HomeEvent {
     case requireLogin
 }
-```
 
-```swift
 func handle(_ event: HomeEvent) {
     switch event {
     case .requireLogin:
@@ -337,8 +376,7 @@ func handle(_ event: HomeEvent) {
 
 ---
 
-### 手段7
-遷移を指示するコードは状態を書き換えるだけにする
+### 手段7: 遷移を指示するコードは状態を書き換えるだけにする
 
 | 遷移の意味 | 書くコード | 実行場所 |
 |---|---|---|
@@ -352,24 +390,6 @@ func handle(_ event: HomeEvent) {
 | modal dismiss（UIKit） | `dismiss(animated:)` | Coordinator |
 | 上位 push | `appPath.append(route)` | App層 |
 | 文脈終了の意図表明 | `dismiss()` | View |
-
-**補足: `@Environment(\.dismiss)` について**
-
-View が「現在の文脈を終了したい」という意図を表明する場合、`@Environment(\.dismiss)` を使用する。
-SwiftUI が文脈に応じて適切な方法（NavigationStack 内では pop、Modal では dismiss）を決定するため、
-View は具体的な終了方法を知る必要がない。
-
-```swift
-struct DetailView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        Button("戻る") {
-            dismiss()  // 文脈終了の意図を表明
-        }
-    }
-}
-```
 
 ---
 
@@ -404,8 +424,8 @@ struct DetailView: View {
 
 #### 設計原則との整合性
 
-- **原則1**「NavigationStack（push）は同一 Feature 内に限定する」→ `[Route]` が完全適合
-- **原則5**「Route は Feature 境界を越えない」→ `[Route]` なら型システムで強制可能
+- **F1: Push限定原則**「NavigationStack（push）は同一 Feature 内に限定する」→ `[Route]` が完全適合
+- **F3: Route境界原則**「Route は Feature 境界を越えない」→ `[Route]` なら型システムで強制可能
 - Feature 境界を越える遷移は Modal / Tab / Event で対応するため、複数型混在の必要がない
 
 #### 選択フローチャート
@@ -504,11 +524,11 @@ UIKit App
 
 #### 設計原則との整合性
 
-- **原則8「文脈を開始した主体が、文脈を終了させる責務を持つ」**
+- **R2: 開始者終了原則「文脈を開始した主体が、文脈を終了させる責務を持つ」**
   - App 層の UIKit Coordinator が Modal 表示・非表示を管理
   - Feature 層は Event を上位に委譲するのみ
 
-- **原則6「構造的に NavigationStack が複数存在してもよいが、同時に有効なものは1つにする」**
+- **C1: 単一文脈原則「構造的に NavigationStack が複数存在してもよいが、同時に有効なものは1つにする」**
   - UITabBarController の各タブが UIHostingController で SwiftUI View をラップ
   - タブ切り替え時、選択されていないタブの NavigationStack は非アクティブ
 
@@ -832,6 +852,7 @@ final class HybridViewController: UIViewController {
 
 | 日付 | 内容 |
 |------|------|
+| 2026-02-08 | 原理9個・原則13個を6カテゴリ・15原則に再構成、画面パターン別マトリクスを追加 |
 | 2026-02-08 | パターン B 追加: UIKit グリッドから SwiftUI Feature を push 遷移するパターン |
 | 2026-02-08 | マッチングアプリモチーフに変更、Home を UIKit グリッド + SwiftUI UserDetail に再構成 |
 | 2026-02-08 | パターン A を modal 表示パターンに変更（UIKit 画面の既存遷移ロジックを活かすため） |
