@@ -10,23 +10,23 @@ API や実装テクニックではなく、
 
 ## 設計原則一覧
 
-| カテゴリ | コード | 原則名 | 概要 |
-|----------|--------|--------|------|
-| **状態駆動** | S1 | 状態結果原則 | 画面は状態の結果 |
-| | S2 | 意味表現原則 | Route は意味を表す |
-| **文脈構造** | C1 | 単一文脈原則 | 有効な文脈は1つ |
-| | C2 | 階層スコープ原則 | 文脈には階層がある |
-| | C3 | 文脈停止原則 | 切替で元文脈は停止 |
-| **Feature境界** | F1 | Push限定原則 | push は同一 Feature 内 |
-| | F2 | 切断遷移原則 | Feature 跨ぎは文脈切断 |
-| | F3 | Route境界原則 | Route は Feature 内定義 |
-| **状態分離** | P1 | Push/Modal分離原則 | push と modal は別状態 |
-| | P2 | Modalスコープ原則 | Modal は文脈スコープで定義 |
-| **責務分離** | R1 | View無決定権原則 | View は遷移を決定しない |
-| | R2 | 開始者終了原則 | 開始した主体が終了責務 |
-| | R3 | 上位強制終了原則 | 強制終了は上位の責務 |
-| **結果伝達** | E1 | 終了結果原則 | 終了には結果が伴う |
-| | E2 | Event委譲原則 | Feature 間は Event で連携 |
+| カテゴリ          | コード | 原則名            | 概要                   |
+| ------------- | --- | -------------- | -------------------- |
+| **状態駆動**      | S1  | 状態結果原則         | 画面は状態の結果             |
+|               | S2  | 意味表現原則         | Route は意味を表す         |
+| **文脈構造**      | C1  | 単一文脈原則         | 有効な文脈は1つ             |
+|               | C2  | 階層スコープ原則       | 文脈には階層がある            |
+|               | C3  | 文脈停止原則         | 切替で元文脈は停止            |
+| **Feature境界** | F1  | Push限定原則       | push は同一 Feature 内   |
+|               | F2  | 切断遷移原則         | Feature 跨ぎは文脈切断      |
+|               | F3  | Route境界原則      | Route は Feature 内定義  |
+| **状態分離**      | P1  | Push/Modal分離原則 | push と modal は別状態    |
+|               | P2  | Modalスコープ原則    | Modal は文脈スコープで定義     |
+| **責務分離**      | R1  | View無決定権原則     | View は遷移を決定しない       |
+|               | R2  | 開始者終了原則        | 開始した主体が終了責務          |
+|               | R3  | 上位強制終了原則       | 強制終了は上位の責務           |
+| **結果伝達**      | E1  | 終了結果原則         | 終了には結果が伴う            |
+|               | E2  | Event委譲原則      | Feature 間は Event で連携 |
 
 ---
 
@@ -426,22 +426,7 @@ func showUserDetail(user: User) {
 
 ---
 
-## 一文要約
-
-**SwiftUI のナビゲーション設計とは、
-アプリの文脈遷移を、状態として正しくモデル化することである。**
-
----
-
-## 課題・検討事項
-
-本ドキュメントの改善に向けて、以下の課題を検討・実装していく。
-
-### 課題1: NavigationPath vs [Route] の選択基準
-
-**ステータス:** 🟢 解決済み
-
-#### 結論
+### 手段9: push 用 path は型安全な `[Route]` を使用する
 
 **原則として `[Route]` を使用する。`NavigationPath` は例外的なケースのみ。**
 
@@ -492,10 +477,6 @@ func showUserDetail(user: User) {
    - 外部 URL から複数階層の状態を復元する必要がある場合
    - ただし、大抵は Feature 単位の `[Route]` で対応可能
 
-#### 本プロジェクトの決定
-
-**全 Feature で `[Route]` を採用し、`NavigationPath` は使用しない。**
-
 ```swift
 // ✅ 推奨: 型安全な [Route]
 @State private var path: [HomeRoute] = []
@@ -504,44 +485,11 @@ func showUserDetail(user: User) {
 @State private var path = NavigationPath()
 ```
 
-理由：
-- 本プロジェクトの全遷移は Feature 内 push または Feature 間の Modal/Tab で実現可能
-- 型安全性と設計原則の整合性を優先
-
 ---
 
-### 課題2: Deep Linking の実装パターン
+### 手段10: UIKit App 層 + SwiftUI Feature 層で構成する
 
-URL から Route への変換、および状態復元のパターンを具体化する。
-
-```swift
-// 例: URL → Route への変換
-func route(from url: URL) -> AppRoute? { ... }
-
-// 例: 状態復元
-func restore(from url: URL) {
-    // path や modal の状態を URL から復元
-}
-```
-
-**検討ポイント:**
-- URL スキーム設計
-- 複数階層の遷移をどう表現するか
-- 認証が必要な画面への Deep Link
-
-**ステータス:** 🔴 未検討
-
----
-
-### 課題3: UIKit との混在パターン
-
-**ステータス:** 🟢 解決済み
-
-#### 結論
-
-**UIKit App 層 + SwiftUI Feature 層**の構成が、UIKit ベースの既存アプリに SwiftUI を導入する際の推奨パターン。
-
-#### 実装パターン
+UIKit ベースの既存アプリに SwiftUI を導入する際の推奨構成。
 
 ```
 UIKit App
@@ -654,9 +602,11 @@ final class MainTabBarController: UITabBarController {
 
 各 Feature（Home, Settings, Login）は SwiftUI のまま維持し、UIHostingController でラップ。
 
-#### 追加の連携パターン
+---
 
-本プロジェクトの基本構成（UIKit App 層 + SwiftUI Feature 層）以外にも、以下の連携パターンが考えられる。
+### 手段11: UIKit / SwiftUI 連携パターンを用途に応じて使い分ける
+
+UIKit App 層と SwiftUI Feature 層の境界では、用途に応じて以下のパターンを使い分ける。
 
 ##### パターン A: SwiftUI Feature 内で UIKit 画面を modal 表示
 
@@ -880,6 +830,42 @@ final class HybridViewController: UIViewController {
 
 ---
 
+## 一文要約
+
+**SwiftUI のナビゲーション設計とは、
+アプリの文脈遷移を、状態として正しくモデル化することである。**
+
+---
+
+## 課題・検討事項
+
+本ドキュメントの改善に向けて、以下の課題を検討・実装していく。
+
+※ 課題1、課題3は解決済みのため、具体的手段（手段9〜11）に還元した。
+
+### 課題2: Deep Linking の実装パターン
+
+URL から Route への変換、および状態復元のパターンを具体化する。
+
+```swift
+// 例: URL → Route への変換
+func route(from url: URL) -> AppRoute? { ... }
+
+// 例: 状態復元
+func restore(from url: URL) {
+    // path や modal の状態を URL から復元
+}
+```
+
+**検討ポイント:**
+- URL スキーム設計
+- 複数階層の遷移をどう表現するか
+- 認証が必要な画面への Deep Link
+
+**ステータス:** 🔴 未検討
+
+---
+
 ### 課題4: エラーハンドリングと文脈遷移
 
 エラー発生時の文脈遷移パターンを原則化する。
@@ -910,6 +896,7 @@ final class HybridViewController: UIViewController {
 
 | 日付 | 内容 |
 |------|------|
+| 2026-02-08 | 解決済み課題（課題1・課題3）を手段9〜11に還元、課題セクションから削除 |
 | 2026-02-08 | 手段8 追加（表示手段の責務分離）、パターン B に Router 共有パターンを追記 |
 | 2026-02-08 | 原理9個・原則13個を6カテゴリ・15原則に再構成、画面パターン別マトリクスを追加 |
 | 2026-02-08 | パターン B 追加: UIKit グリッドから SwiftUI Feature を push 遷移するパターン |
