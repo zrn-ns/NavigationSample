@@ -115,6 +115,22 @@ enum ScreenDesignInfoProvider {
         """
     )
 
+    // MARK: - DesignOverview (SwiftUI)
+
+    static let designOverview = ScreenDesignInfo(
+        id: "designOverview",
+        screenName: "設計情報",
+        framework: .swiftUI,
+        layer: .view,
+        rootViewName: "DesignOverviewView",
+        patterns: [.featureRoot],
+        appliedPrinciples: [.s1, .s2, .c1],
+        description: """
+        設計原則・具体的手段・画面パターン別マトリクスを俯瞰する画面。
+        独自の NavigationStack を持ち、原則詳細・手段詳細への push 遷移を提供する。
+        """
+    )
+
     // MARK: - Login Feature (SwiftUI Modal)
 
     static let loginStart = ScreenDesignInfo(

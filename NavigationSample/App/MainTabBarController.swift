@@ -40,6 +40,15 @@ final class MainTabBarController: UITabBarController {
         let settingsVC = UIHostingController(rootView: settingsRootView)
         settingsVC.tabBarItem = UITabBarItem(title: "設定", image: UIImage(systemName: "gear"), tag: 1)
 
-        viewControllers = [homeNavController, settingsVC]
+        // 設計情報タブ (SwiftUI ベース)
+        let designOverviewView = DesignOverviewView()
+        let designVC = UIHostingController(rootView: designOverviewView)
+        designVC.tabBarItem = UITabBarItem(
+            title: "設計情報",
+            image: UIImage(systemName: "doc.text.magnifyingglass"),
+            tag: 2
+        )
+
+        viewControllers = [homeNavController, settingsVC, designVC]
     }
 }

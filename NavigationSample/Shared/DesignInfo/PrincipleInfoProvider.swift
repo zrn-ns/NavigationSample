@@ -16,6 +16,7 @@ enum PrincipleInfoProvider {
         ScreenDesignInfoProvider.userPhotoDetail,
         ScreenDesignInfoProvider.likeSend,
         ScreenDesignInfoProvider.settings,
+        ScreenDesignInfoProvider.designOverview,
         ScreenDesignInfoProvider.loginStart,
         ScreenDesignInfoProvider.loginComplete,
         ScreenDesignInfoProvider.loginFailure,
