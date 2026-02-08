@@ -18,9 +18,7 @@ struct HomeView: View {
         List {
             Section {
                 ForEach(items) { item in
-                    Button {
-                        router.navigate(to: .itemDetail(item.id))
-                    } label: {
+                    VStack(alignment: .leading, spacing: 8) {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(item.title)
                                 .font(.headline)
@@ -28,8 +26,22 @@ struct HomeView: View {
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
+
+                        HStack(spacing: 12) {
+                            Button("SwiftUI 版") {
+                                router.navigate(to: .itemDetail(item.id))
+                            }
+                            .buttonStyle(.bordered)
+
+                            Button("UIKit 版（modal）") {
+                                router.showLegacyItemDetail(itemId: item.id)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(.orange)
+                        }
+                        .font(.caption)
                     }
-                    .foregroundStyle(.primary)
+                    .padding(.vertical, 4)
                 }
             } header: {
                 Text("アイテム一覧")

@@ -31,6 +31,11 @@ final class HomeRouter {
         modal = .edit(itemId)
     }
 
+    /// UIKit 詳細画面をモーダルで表示
+    func showLegacyItemDetail(itemId: Item.ID) {
+        modal = .legacyItemDetail(itemId)
+    }
+
     /// モーダルを閉じる
     func dismissModal() {
         modal = nil

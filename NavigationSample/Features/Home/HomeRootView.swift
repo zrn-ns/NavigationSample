@@ -71,6 +71,18 @@ struct HomeRootView: View {
                         }
                     )
                 }
+
+            case .legacyItemDetail(let itemId):
+                if let item = Item.samples.first(where: { $0.id == itemId }) {
+                    // UIKit 画面を UINavigationController でラップして modal 表示
+                    // UIKit 側で自由に push/pop できる
+                    LegacyItemDetailModalView(
+                        item: item,
+                        onDismiss: {
+                            router.dismissModal()
+                        }
+                    )
+                }
             }
         }
         .onAppear {
