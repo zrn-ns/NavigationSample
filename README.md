@@ -2,6 +2,8 @@
 
 UIKitとSwiftUIが混在するプロジェクトにおける、ナビゲーション設計のコンセプトとサンプル実装をまとめたリポジトリです。
 
+**マッチングアプリをモチーフとしたサンプル**で、UIKit グリッドから SwiftUI 詳細画面への push 遷移パターンを実装しています。
+
 ## 背景
 
 ### UIKitからSwiftUIへの移行期
@@ -59,71 +61,119 @@ NavigationSample/
 ├── App/
 │   ├── AppDelegate.swift           # UIApplicationDelegate
 │   ├── SceneDelegate.swift         # UIWindowSceneDelegate
-│   ├── AppCoordinator.swift        # App層の状態管理
+│   ├── AppCoordinator.swift        # App層の状態管理 + UserGridCoordinator 保持
 │   ├── MainTabBarController.swift  # UITabBarController
 │   └── AppModal.swift              # App全体Modal定義
 │
 ├── Features/
-│   ├── Home/
-│   │   ├── HomeRoute.swift         # push用Route
-│   │   ├── HomeEvent.swift         # App層へのイベント
-│   │   ├── HomeRootView.swift      # NavigationStack配置
-│   │   ├── HomeView.swift          # 一覧画面
-│   │   └── HomeItemDetailView.swift # 詳細画面
+│   ├── Home/                       # UIKit ベースのグリッド
+│   │   ├── UserGridCoordinator.swift    # UIKit Coordinator
+│   │   └── Views/
+│   │       ├── UserGridViewController.swift  # UICollectionView グリッド
+│   │       └── UserGridCell.swift            # グリッドセル
 │   │
-│   ├── Settings/
+│   ├── UserDetail/                 # SwiftUI ベースの詳細 Feature
+│   │   ├── UserDetailRoute.swift        # Feature 内 push 用 Route
+│   │   ├── UserDetailEvent.swift        # App 層へのイベント
+│   │   ├── UserDetailModal.swift        # Feature 内 modal 用
+│   │   ├── UserDetailRouter.swift       # path, modal, onEvent 管理
+│   │   ├── UserDetailRootView.swift     # NavigationStack 配置
+│   │   └── Views/
+│   │       ├── UserDetailView.swift          # ユーザ詳細画面
+│   │       ├── UserPhotoListView.swift       # 写真一覧（push 遷移）
+│   │       ├── UserPhotoDetailView.swift     # 写真拡大
+│   │       ├── LegacyProfileViewController.swift   # UIKit 画面（パターン A）
+│   │       └── LegacyProfileModalView.swift        # UIKit modal ラッパー
+│   │
+│   ├── Settings/                   # SwiftUI ベース
 │   │   ├── SettingsRoute.swift
 │   │   ├── SettingsEvent.swift
+│   │   ├── SettingsRouter.swift
 │   │   ├── SettingsRootView.swift
-│   │   ├── SettingsView.swift
-│   │   └── SettingsDetailView.swift
+│   │   └── Views/
+│   │       ├── SettingsView.swift
+│   │       └── SettingsDetailView.swift
 │   │
-│   └── Login/
+│   └── Login/                      # SwiftUI ベース
 │       ├── LoginRoute.swift
 │       ├── LoginEvent.swift
+│       ├── LoginRouter.swift
 │       ├── LoginRootView.swift
-│       ├── LoginStartView.swift
-│       └── LoginCompleteView.swift
+│       └── Views/
+│           ├── LoginStartView.swift
+│           ├── LoginCompleteView.swift
+│           └── LoginFailureView.swift
 │
 └── Shared/
     └── Models/
-        └── Item.swift              # サンプルモデル
+        └── User.swift              # ユーザモデル
 ```
 
 ### 設計原則の適用
 
 | 原則 | 実装での適用 |
 |------|-------------|
-| 原則1: push は Feature 内限定 | `HomeRoute` は Home 内のみで使用 |
-| 原則3: push/modal 状態分離 | `path: [Route]` と `modal: AppModal?` を分離 |
-| 原則9: View は遷移決定権なし | `onNavigate` / `onEvent` コールバックで意図表明 |
-| 原則12: Modal結果はイベント | `LoginEvent.completed` / `cancelled` で返却 |
+| 原則1: push は Feature 内限定 | `UserDetailRoute` は UserDetail 内のみで使用 |
+| 原則3: push/modal 状態分離 | `path: [Route]` と `modal: Modal?` を分離 |
+| 原則8: 文脈を開始した主体が終了 | UserGridCoordinator が詳細画面の push/pop を管理 |
+| 原則9: View は遷移決定権なし | `onEvent` コールバックで意図表明 |
+| 原則12: Modal結果はイベント | `UserDetailEvent.dismissed` / `liked` で返却 |
 
-### 連携フロー
+### アーキテクチャ
+
+```
+UIKit App層
+├── AppCoordinator
+│   └── UserDetailEvent をハンドリング
+└── MainTabBarController
+    ├── [Tab 0: ホーム] UINavigationController
+    │   ├── UserGridViewController (UIKit, root)
+    │   │   └── didSelectUser → coordinator.showUserDetail()
+    │   └── UIHostingController<UserDetailRootView> (pushed)
+    │       └── UserDetailRootView (SwiftUI Feature)
+    │           ├── UserDetailRouter
+    │           │   ├── path: [UserDetailRoute]
+    │           │   └── modal: UserDetailModal?
+    │           └── NavigationStack
+    │               ├── UserDetailView
+    │               │   ├── .photos → UserPhotoListView (push)
+    │               │   └── .legacyProfile → LegacyProfileModalView (modal)
+    │               └── UserPhotoListView
+    │                   └── .photoDetail → UserPhotoDetailView (push)
+    └── [Tab 1: 設定] UIHostingController<SettingsRootView>
+        └── (既存のまま)
+```
+
+### 遷移フロー
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │                    App Layer (UIKit)                      │
-│  AppCoordinator.handle(event) → 状態変更 → UI更新        │
-│  MainTabBarController - タブ管理、Modal表示              │
+│  AppCoordinator                                          │
+│  └── UserGridCoordinator.handle(event)                   │
+│       └── .dismissed / .liked → pop                      │
 └───────────────────────┬──────────────────────────────────┘
                         │ Event
 ┌───────────────────────▼──────────────────────────────────┐
-│              Feature Layer (SwiftUI)                      │
-│  UIHostingController ─ HomeRootView ─ HomeView           │
-│                             │               │             │
-│                             │ onEvent       │ onNavigate  │
-│                             ▼               ▼             │
-│                        App層へ委譲    path.append()       │
+│              UserDetail Feature (SwiftUI)                 │
+│  UIHostingController ─ UserDetailRootView                │
+│                             │                             │
+│                             ├── path.append(.photos)      │
+│                             ├── path.append(.photoDetail) │
+│                             ├── modal = .legacyProfile    │
+│                             └── sendEvent(.liked)         │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### 動作確認できる機能
 
-- **Home Feature**: アイテム一覧 → 詳細画面への push/pop 遷移
+- **Home (UIKit グリッド)**: ユーザ一覧をグリッド表示
+- **UserDetail (SwiftUI)**: UIKit グリッドから push 遷移で詳細表示
+- **Feature 内 push**: 詳細 → 写真一覧 → 写真拡大 の push 遷移
+- **パターン A**: SwiftUI 詳細画面から UIKit 画面を modal 表示
 - **Settings Feature**: 設定項目 → 詳細画面への push/pop 遷移
-- **Tab 切り替え**: Home ↔ Settings のタブ切り替え（Event 経由）
-- **Login Modal**: Home からログインモーダル表示 → 完了/キャンセルで自動クローズ
+- **Tab 切り替え**: Home ↔ Settings のタブ切り替え
+- **Login Modal**: 設定からログインモーダル表示 → 完了/キャンセルで自動クローズ
 
 ## ライセンス
 

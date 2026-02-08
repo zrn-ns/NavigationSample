@@ -616,14 +616,14 @@ SwiftUI の Feature から UIKit の画面を表示したい場合、**modal で
 
 ```swift
 // UINavigationController でラップして modal 表示
-struct LegacyItemDetailModalView: View {
-    let item: Item
+struct LegacyProfileModalView: View {
+    let user: User
     let onDismiss: () -> Void
 
     var body: some View {
-        LegacyNavigationControllerRepresentable(
-            rootViewController: LegacyItemDetailViewController(
-                item: item,
+        LegacyProfileNavigationControllerRepresentable(
+            rootViewController: LegacyProfileViewController(
+                user: user,
                 onDismiss: onDismiss
             )
         )
@@ -632,7 +632,7 @@ struct LegacyItemDetailModalView: View {
 }
 
 // UINavigationController を SwiftUI でラップ
-struct LegacyNavigationControllerRepresentable: UIViewControllerRepresentable {
+struct LegacyProfileNavigationControllerRepresentable: UIViewControllerRepresentable {
     let rootViewController: UIViewController
 
     func makeUIViewController(context: Context) -> UINavigationController {
@@ -643,23 +643,19 @@ struct LegacyNavigationControllerRepresentable: UIViewControllerRepresentable {
 }
 
 // Modal として定義
-enum HomeModal: Identifiable, Hashable {
-    case edit(Item.ID)
-    case legacyItemDetail(Item.ID)  // UIKit 画面
-    var id: Self { self }
+enum UserDetailModal: Identifiable {
+    case legacyProfile  // UIKit 画面
+    var id: String { ... }
 }
 
 // sheet で表示
 .sheet(item: $router.modal) { modal in
     switch modal {
-    case .legacyItemDetail(let itemId):
-        if let item = Item.samples.first(where: { $0.id == itemId }) {
-            LegacyItemDetailModalView(
-                item: item,
-                onDismiss: { router.dismissModal() }
-            )
-        }
-    // ...
+    case .legacyProfile:
+        LegacyProfileModalView(
+            user: router.user,
+            onDismiss: { router.dismissModal() }
+        )
     }
 }
 ```
@@ -670,21 +666,80 @@ enum HomeModal: Identifiable, Hashable {
 - 閉じるときだけ SwiftUI 側に `onDismiss` で通知
 - 既存の UIKit 画面への影響が最小限
 
-##### パターン B: UIKit 画面から SwiftUI Feature を表示
+##### パターン B: UIKit グリッドから SwiftUI Feature を push 遷移
 
-UIKit の UIViewController から SwiftUI で書かれた Feature を push または present する場合。
+UIKit の UIViewController（例: グリッド一覧）から SwiftUI で書かれた Feature を **push 遷移**で表示する場合。
+本プロジェクトの主要な実装パターン。
 
 ```swift
-// UIKit ViewController から SwiftUI Feature を push
-final class SomeViewController: UIViewController {
-    private func showSwiftUIFeature() {
-        let swiftUIView = SettingsRootView(onEvent: { [weak self] event in
-            self?.handleSettingsEvent(event)
-        })
-        let hostingController = UIHostingController(rootView: swiftUIView)
-        navigationController?.pushViewController(hostingController, animated: true)
+// UIKit Coordinator
+@MainActor
+final class UserGridCoordinator {
+    private let navigationController: UINavigationController
+    private weak var appCoordinator: AppCoordinator?
+
+    /// ユーザ詳細画面を push 遷移で表示
+    func showUserDetail(user: User) {
+        let detailRootView = UserDetailRootView(
+            user: user,
+            onEvent: { [weak self] event in
+                self?.handle(event)
+            }
+        )
+        let hostingController = UIHostingController(rootView: detailRootView)
+        navigationController.pushViewController(hostingController, animated: true)
     }
 
+    /// UserDetail Feature からのイベントをハンドリング
+    private func handle(_ event: UserDetailEvent) {
+        switch event {
+        case .dismissed:
+            navigationController.popViewController(animated: true)
+        case .liked(let userId):
+            // いいね処理後 pop
+            navigationController.popViewController(animated: true)
+        }
+    }
+}
+
+// UIKit ViewController
+final class UserGridViewController: UIViewController, UICollectionViewDelegate {
+    private weak var coordinator: UserGridCoordinator?
+
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let user = users[indexPath.item]
+        coordinator?.showUserDetail(user: user)
+    }
+}
+```
+
+**ポイント:**
+- UINavigationController を UIKit Coordinator が保持
+- SwiftUI Feature を UIHostingController でラップして push
+- SwiftUI Feature からのイベント（dismissed, liked 等）を Coordinator がハンドリング
+- push されたSwiftUI Feature 内では独自の NavigationStack で Feature 内 push 遷移が可能
+
+**アーキテクチャ:**
+```
+UINavigationController (UIKit)
+├── UserGridViewController (UIKit, root)
+│   └── didSelectUser → coordinator.showUserDetail()
+└── UIHostingController<UserDetailRootView> (pushed)
+    └── UserDetailRootView (SwiftUI)
+        ├── NavigationStack (Feature 内遷移用)
+        │   ├── UserDetailView
+        │   ├── UserPhotoListView (push)
+        │   └── UserPhotoDetailView (push)
+        └── onEvent → coordinator.handle(event)
+```
+
+##### パターン C: UIKit 画面から SwiftUI Feature を modal 表示
+
+UIKit の UIViewController から SwiftUI で書かれた Feature を modal（present）で表示する場合。
+
+```swift
+// UIKit ViewController から SwiftUI Feature を present
+final class SomeViewController: UIViewController {
     private func presentSwiftUIFeature() {
         let swiftUIView = LoginRootView(onEvent: { [weak self] event in
             self?.handleLoginEvent(event)
@@ -697,11 +752,11 @@ final class SomeViewController: UIViewController {
 ```
 
 **ポイント:**
-- UIHostingController で SwiftUI View をラップして push/present
+- UIHostingController で SwiftUI View をラップして present
 - onEvent クロージャで UIKit 側にイベントを伝達
 - SwiftUI Feature 内の NavigationStack は独立して機能
 
-##### パターン C: UIKit 画面の一部を SwiftUI で構築
+##### パターン D: UIKit 画面の一部を SwiftUI で構築
 
 UIKit の UIViewController 内の一部のビューだけ SwiftUI で書く場合。
 
@@ -777,6 +832,8 @@ final class HybridViewController: UIViewController {
 
 | 日付 | 内容 |
 |------|------|
+| 2026-02-08 | パターン B 追加: UIKit グリッドから SwiftUI Feature を push 遷移するパターン |
+| 2026-02-08 | マッチングアプリモチーフに変更、Home を UIKit グリッド + SwiftUI UserDetail に再構成 |
 | 2026-02-08 | パターン A を modal 表示パターンに変更（UIKit 画面の既存遷移ロジックを活かすため） |
 | 2026-02-08 | 課題3「UIKit との混在パターン」を解決済みに更新、App 層を UIKit に変更 |
 | 2026-02-06 | 課題1「NavigationPath vs [Route] の選択基準」を解決済みに更新 |
