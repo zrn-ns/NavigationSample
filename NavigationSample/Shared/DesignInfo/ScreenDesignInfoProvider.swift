@@ -40,6 +40,12 @@ enum ScreenDesignInfoProvider {
         UserDetail Feature の起点画面。NavigationStack の root として機能し、
         Feature 内で push 遷移（写真一覧・写真詳細）と modal 表示（いいね送信画面）を管理する。
         UserDetailRouter がバケツリレーで状態を管理。
+
+        DisplayMode による表示パターンの違い:
+        ・standard — Home タブからの遷移。左上に「← 戻る」ボタン、「いいね！」ボタンあり。
+        ・me — 設定タブからのプロフィールプレビュー。右上に「×」ボタン（iOS 慣例の閉じるボタン配置）、\
+        「いいね！」ボタンなし。
+        どちらも dismiss() → Event(.dismissed) で App 層に終了を通知する点は共通（R2, E2）。
         """
     )
 
