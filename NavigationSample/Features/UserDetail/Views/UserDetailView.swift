@@ -18,7 +18,6 @@ struct UserDetailView: View {
             }
             .padding()
         }
-        .background(Color.swiftUIBackground)
         .navigationTitle(router.user.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

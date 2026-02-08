@@ -23,11 +23,24 @@ final class DesignInfoButton: UIButton {
         fatalError("init(coder:) has not been implemented")
     }
 
+    private var baseBackgroundColor: UIColor {
+        switch info.framework {
+        case .swiftUI: .systemOrange
+        case .uiKit: .systemBlue
+        }
+    }
+
     private func setupButton() {
         var config = UIButton.Configuration.filled()
-        config.image = UIImage(systemName: "questionmark.circle.fill")
+        config.title = info.framework.rawValue
         config.cornerStyle = .capsule
-        config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12)
+        config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
+        config.baseBackgroundColor = baseBackgroundColor
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var outgoing = incoming
+            outgoing.font = .systemFont(ofSize: 12, weight: .bold)
+            return outgoing
+        }
         configuration = config
 
         layer.shadowColor = UIColor.black.cgColor

@@ -31,16 +31,25 @@ struct DesignInfoFloatingButtonModifier: ViewModifier {
             }
     }
 
+    private var buttonColor: Color {
+        switch info.framework {
+        case .swiftUI: .orange
+        case .uiKit: .blue
+        }
+    }
+
     private var floatingButton: some View {
         Button {
             isPresented = true
         } label: {
-            Image(systemName: "questionmark.circle.fill")
-                .font(.title)
+            Text(info.framework.rawValue)
+                .font(.caption)
+                .fontWeight(.bold)
                 .foregroundStyle(.white)
-                .padding(12)
-                .background(Color.accentColor)
-                .clipShape(Circle())
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(buttonColor)
+                .clipShape(Capsule())
                 .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
         }
         .padding(.trailing, 16)

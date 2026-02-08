@@ -41,7 +41,7 @@ final class UserGridViewController: UIViewController {
 
     private func setupUI() {
         title = "ホーム"
-        view.backgroundColor = .uiKitBackground
+        view.backgroundColor = .systemBackground
 
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([

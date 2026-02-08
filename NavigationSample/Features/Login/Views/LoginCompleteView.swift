@@ -37,7 +37,6 @@ struct LoginCompleteView: View {
             .padding(.horizontal)
         }
         .padding()
-        .background(Color.swiftUIBackground)
         .navigationTitle("完了")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)

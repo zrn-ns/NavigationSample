@@ -31,7 +31,6 @@ struct SettingsDetailView: View {
             .buttonStyle(.bordered)
         }
         .padding()
-        .background(Color.swiftUIBackground)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .designInfoButton(ScreenDesignInfoProvider.settingsDetail)

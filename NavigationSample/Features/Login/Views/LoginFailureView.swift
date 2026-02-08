@@ -36,7 +36,6 @@ struct LoginFailureView: View {
             .padding(.horizontal)
         }
         .padding()
-        .background(Color.swiftUIBackground)
         .navigationTitle("エラー")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
