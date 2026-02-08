@@ -71,18 +71,21 @@ enum ScreenDesignInfoProvider {
         """
     )
 
+    // MARK: - LikeSend Feature (UIKit)
+
     static let likeSend = ScreenDesignInfo(
         id: "likeSend",
         screenName: "いいね送信",
         framework: .uiKit,
-        layer: .view,
-        rootViewName: "LikeSendViewController",
+        layer: .feature,
+        rootViewName: "LikeSendRootView",
         patterns: [.patternA],
         appliedPrinciples: [.c1, .c3, .p2, .r2, .e1],
         description: """
-        SwiftUI の UserDetail Feature からセミモーダルで表示される UIKit 画面（パターン A）。
-        いいね（1pt）またはスペシャルいいね（3pt）を選択して送信する。
-        送信完了は onLikeSent コールバックで SwiftUI 側に通知する。
+        独立した LikeSend Feature。UserDetail Feature からセミモーダルで表示される。
+        LikeSendRootView が Feature エントリポイントで、UIKit の LikeSendViewController を \
+        UIViewControllerRepresentable でラップ（パターン A）。
+        LikeSendEvent で上位にいいね送信完了・キャンセルを通知する。
         """
     )
 
