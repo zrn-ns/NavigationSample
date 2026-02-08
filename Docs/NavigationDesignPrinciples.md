@@ -393,6 +393,39 @@ func handle(_ event: HomeEvent) {
 
 ---
 
+### 手段8: 表示手段（トランジション・インタラクティブ dismiss）は Coordinator の責務とする
+
+同一 Feature でも表示元によって表示手段が異なることがある。
+
+| 表示元 | 表示先 | 表示手段 |
+|--------|--------|----------|
+| UserGrid | UserDetail | push 風カスタムトランジション + スワイプ dismiss |
+| Settings | プロフィールプレビュー | 通常 fullScreenModal（スワイプ dismiss なし） |
+
+**原則:**
+- Feature の API に表示手段に依存するパラメータ（ナビゲーション深度コールバック等）を追加しない
+- 表示手段の違いは Coordinator が吸収する
+- Coordinator が Feature の Router の状態を参照する必要がある場合は、Router を Coordinator で生成し Feature に渡す
+
+```swift
+// Coordinator が router を生成し、状態を参照する
+func showUserDetail(user: User) {
+    let router = UserDetailRouter(user: user)
+
+    dismissalInteractor.isAtNavigationRoot = { [weak router] in
+        router?.path.isEmpty ?? true
+    }
+
+    let detailRootView = UserDetailRootView(
+        router: router,
+        onEvent: { [weak self] event in self?.handle(event) }
+    )
+    // ...
+}
+```
+
+---
+
 ## 一文要約
 
 **SwiftUI のナビゲーション設計とは、
@@ -753,6 +786,31 @@ UINavigationController (UIKit)
         └── onEvent → coordinator.handle(event)
 ```
 
+**Router 共有とインタラクティブ dismiss:**
+
+Coordinator が Router の状態を参照してインタラクティブ dismiss を制御する場合、
+Router を Coordinator で生成し Feature に渡す（手段8 参照）。
+
+```swift
+func showUserDetail(user: User) {
+    let router = UserDetailRouter(user: user)
+
+    // router.path.isEmpty を遅延参照し、root 画面でのみ dismiss を許可
+    dismissalInteractor.isAtNavigationRoot = { [weak router] in
+        router?.path.isEmpty ?? true
+    }
+
+    let detailRootView = UserDetailRootView(
+        router: router,
+        onEvent: { [weak self] event in self?.handle(event) }
+    )
+    // ...
+}
+```
+
+これにより UIKit 内部の UINavigationController 探索（`findNavigationController`）に依存せず、
+SwiftUI の Router 状態のみで dismiss 可否を判定できる。
+
 ##### パターン C: UIKit 画面から SwiftUI Feature を modal 表示
 
 UIKit の UIViewController から SwiftUI で書かれた Feature を modal（present）で表示する場合。
@@ -852,6 +910,7 @@ final class HybridViewController: UIViewController {
 
 | 日付 | 内容 |
 |------|------|
+| 2026-02-08 | 手段8 追加（表示手段の責務分離）、パターン B に Router 共有パターンを追記 |
 | 2026-02-08 | 原理9個・原則13個を6カテゴリ・15原則に再構成、画面パターン別マトリクスを追加 |
 | 2026-02-08 | パターン B 追加: UIKit グリッドから SwiftUI Feature を push 遷移するパターン |
 | 2026-02-08 | マッチングアプリモチーフに変更、Home を UIKit グリッド + SwiftUI UserDetail に再構成 |
