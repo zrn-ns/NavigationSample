@@ -97,7 +97,7 @@ final class PushTransitionAnimator: NSObject, UIViewControllerAnimatedTransition
 
 /// fullScreenModal の push 風トランジションを提供するデリゲート
 final class PushTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
-    let dismissalInteractor = EdgeSwipeDismissalInteractor()
+    let dismissalInteractor = SwipeDismissalInteractor()
 
     func animationController(
         forPresented presented: UIViewController,
@@ -120,27 +120,26 @@ final class PushTransitioningDelegate: NSObject, UIViewControllerTransitioningDe
     }
 }
 
-// MARK: - Edge Swipe Dismissal
+// MARK: - Swipe Dismissal
 
-/// エッジスワイプによるインタラクティブ dismiss を管理する
-final class EdgeSwipeDismissalInteractor: UIPercentDrivenInteractiveTransition {
+/// 左→右スワイプによるインタラクティブ dismiss を管理する
+final class SwipeDismissalInteractor: UIPercentDrivenInteractiveTransition {
     private(set) var isInteracting = false
     private weak var viewController: UIViewController?
 
-    /// 対象の VC にエッジスワイプジェスチャーを追加する
+    /// 対象の VC にスワイプジェスチャーを追加する
     func attach(to viewController: UIViewController) {
         self.viewController = viewController
 
-        let edgePan = UIScreenEdgePanGestureRecognizer(
+        let pan = UIPanGestureRecognizer(
             target: self,
-            action: #selector(handleEdgePan(_:))
+            action: #selector(handlePan(_:))
         )
-        edgePan.edges = .left
-        edgePan.delegate = self
-        viewController.view.addGestureRecognizer(edgePan)
+        pan.delegate = self
+        viewController.view.addGestureRecognizer(pan)
     }
 
-    @objc private func handleEdgePan(_ gesture: UIScreenEdgePanGestureRecognizer) {
+    @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
         guard let view = gesture.view else { return }
 
         let translation = gesture.translation(in: view)
@@ -189,11 +188,19 @@ final class EdgeSwipeDismissalInteractor: UIPercentDrivenInteractiveTransition {
 
 // MARK: - UIGestureRecognizerDelegate
 
-extension EdgeSwipeDismissalInteractor: UIGestureRecognizerDelegate {
+extension SwipeDismissalInteractor: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let pan = gestureRecognizer as? UIPanGestureRecognizer,
+              let view = pan.view else { return false }
+
+        let velocity = pan.velocity(in: view)
+        // 右方向かつ水平な操作のみ受け付ける
+        return velocity.x > 0 && abs(velocity.x) > abs(velocity.y)
+    }
+
     /// NavigationStack 内部の pop ジェスチャーを優先させる
     ///
-    /// iOS 26 では NavigationStack の pop ジェスチャーが UIPanGestureRecognizer に変更されたため、
-    /// 型ではなく interactivePopGestureRecognizer のインスタンス比較で判定する。
+    /// interactivePopGestureRecognizer のインスタンス比較で判定する。
     /// - root 画面: interactivePopGestureRecognizer が fail → dismiss ジェスチャーが発火
     /// - pushed 画面: interactivePopGestureRecognizer が succeed → dismiss は発火しない
     func gestureRecognizer(
