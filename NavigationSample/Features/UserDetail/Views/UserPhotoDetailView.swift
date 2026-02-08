@@ -41,6 +41,7 @@ struct UserPhotoDetailView: View {
         .background(Color.swiftUIBackground)
         .navigationTitle("写真")
         .navigationBarTitleDisplayMode(.inline)
+        .designInfoButton(ScreenDesignInfoProvider.userPhotoDetail)
     }
 }
 

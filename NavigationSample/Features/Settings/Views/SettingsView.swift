@@ -53,6 +53,7 @@ struct SettingsView: View {
         }
         .background(Color.swiftUIBackground)
         .navigationTitle("設定")
+        .designInfoButton(ScreenDesignInfoProvider.settings)
     }
 }
 

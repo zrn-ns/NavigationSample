@@ -59,6 +59,7 @@ struct LoginStartView: View {
         .background(Color.swiftUIBackground)
         .navigationTitle("ログイン")
         .navigationBarTitleDisplayMode(.inline)
+        .designInfoButton(ScreenDesignInfoProvider.loginStart)
     }
 }
 

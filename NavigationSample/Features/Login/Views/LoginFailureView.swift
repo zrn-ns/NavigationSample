@@ -40,6 +40,7 @@ struct LoginFailureView: View {
         .navigationTitle("エラー")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .designInfoButton(ScreenDesignInfoProvider.loginFailure)
     }
 }
 

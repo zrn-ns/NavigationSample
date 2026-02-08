@@ -33,6 +33,7 @@ struct UserDetailView: View {
                 }
             }
         }
+        .designInfoButton(ScreenDesignInfoProvider.userDetail)
     }
 
     // MARK: - Subviews

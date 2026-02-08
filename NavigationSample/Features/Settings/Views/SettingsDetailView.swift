@@ -34,6 +34,7 @@ struct SettingsDetailView: View {
         .background(Color.swiftUIBackground)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
+        .designInfoButton(ScreenDesignInfoProvider.settingsDetail)
     }
 }
 

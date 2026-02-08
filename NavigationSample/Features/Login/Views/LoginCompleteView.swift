@@ -41,6 +41,7 @@ struct LoginCompleteView: View {
         .navigationTitle("完了")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .designInfoButton(ScreenDesignInfoProvider.loginComplete)
     }
 }
 
