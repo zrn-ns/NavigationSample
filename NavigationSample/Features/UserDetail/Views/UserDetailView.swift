@@ -20,6 +20,18 @@ struct UserDetailView: View {
         }
         .navigationTitle(router.user.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    router.dismiss()
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("戻る")
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Subviews

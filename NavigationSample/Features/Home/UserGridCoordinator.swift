@@ -8,11 +8,18 @@ import SwiftUI
 
 /// Home タブの遷移を管理する Coordinator
 ///
-/// UIKit グリッド → SwiftUI 詳細 Feature への push 遷移を管理
+/// UIKit グリッド → SwiftUI 詳細 Feature への遷移を管理
+/// fullScreenModal + push 風アニメーションで表示
 @MainActor
 final class UserGridCoordinator {
     private let navigationController: UINavigationController
     private weak var appCoordinator: AppCoordinator?
+
+    /// push 風トランジションのデリゲート（強参照で保持）
+    private let transitioningDelegate = PushTransitioningDelegate()
+
+    /// 現在表示中の詳細画面
+    private weak var presentedDetailVC: UIViewController?
 
     init(navigationController: UINavigationController, appCoordinator: AppCoordinator) {
         self.navigationController = navigationController
@@ -28,7 +35,7 @@ final class UserGridCoordinator {
         navigationController.setViewControllers([gridVC], animated: false)
     }
 
-    /// ユーザ詳細画面を push 遷移で表示
+    /// ユーザ詳細画面を fullScreenModal（push 風アニメーション）で表示
     func showUserDetail(user: User) {
         let detailRootView = UserDetailRootView(
             user: user,
@@ -37,21 +44,27 @@ final class UserGridCoordinator {
             }
         )
         let hostingController = UIHostingController(rootView: detailRootView)
-        // SwiftUI 側の NavigationBar は非表示にし、UIKit 側で管理
-        hostingController.navigationItem.largeTitleDisplayMode = .never
-        navigationController.pushViewController(hostingController, animated: true)
+
+        // fullScreenModal + カスタムトランジション
+        hostingController.modalPresentationStyle = .fullScreen
+        hostingController.transitioningDelegate = transitioningDelegate
+
+        presentedDetailVC = hostingController
+        navigationController.present(hostingController, animated: true)
     }
 
     /// UserDetail Feature からのイベントをハンドリング
     private func handle(_ event: UserDetailEvent) {
         switch event {
         case .dismissed:
-            navigationController.popViewController(animated: true)
+            presentedDetailVC?.dismiss(animated: true)
+            presentedDetailVC = nil
 
         case .liked(let userId):
-            // いいね処理（ここでは単純に pop して戻る）
+            // いいね処理（ここでは単純に dismiss して戻る）
             print("いいねを送りました: \(userId)")
-            navigationController.popViewController(animated: true)
+            presentedDetailVC?.dismiss(animated: true)
+            presentedDetailVC = nil
         }
     }
 }
