@@ -62,51 +62,5 @@ struct ScreenDesignInfo: Identifiable {
         // 結果伝達
         case e1 = "E1: 終了結果原則"
         case e2 = "E2: Event委譲原則"
-
-        /// カテゴリ名
-        var category: String {
-            switch self {
-            case .s1, .s2: return "状態駆動"
-            case .c1, .c2, .c3: return "文脈構造"
-            case .f1, .f2, .f3: return "Feature境界"
-            case .p1, .p2: return "状態分離"
-            case .r1, .r2: return "責務分離"
-            case .e1, .e2: return "結果伝達"
-            }
-        }
-
-        /// 説明
-        var explanation: String {
-            switch self {
-            case .s1:
-                return "ナビゲーションは「画面遷移」ではなく「状態遷移」である"
-            case .s2:
-                return "Route は「画面」ではなく「意味」を表す"
-            case .c1:
-                return "表示されている View が属するナビゲーション文脈は常に1つである"
-            case .c2:
-                return "文脈（Context）には階層とスコープがある"
-            case .c3:
-                return "文脈が切り替わると、元の文脈は一時停止される"
-            case .f1:
-                return "NavigationStack（push）は同一 Feature 内に限定する"
-            case .f2:
-                return "Feature を跨ぐ遷移は「文脈の切断」として扱う"
-            case .f3:
-                return "Route は Feature 境界を越えない"
-            case .p1:
-                return "Push 用の状態と Modal 用の状態は分離する"
-            case .p2:
-                return "Modal は「一時的 UI」ではなく「独立した文脈」である"
-            case .r1:
-                return "View は遷移の決定権を持たない"
-            case .r2:
-                return "文脈を開始した主体が、文脈を終了させる責務を持つ"
-            case .e1:
-                return "「画面を閉じる」とは「文脈を終了させる」ことであり、結果を伴う"
-            case .e2:
-                return "Modal 内の処理結果は「閉じる命令」ではなく「イベント」として返す"
-            }
-        }
     }
 }
