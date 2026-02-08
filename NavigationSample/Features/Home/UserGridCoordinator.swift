@@ -37,8 +37,9 @@ final class UserGridCoordinator {
 
     /// ユーザ詳細画面を fullScreenModal（push 風アニメーション）で表示
     func showUserDetail(user: User) {
+        let router = UserDetailRouter(user: user)
         let detailRootView = UserDetailRootView(
-            user: user,
+            router: router,
             onEvent: { [weak self] event in
                 self?.handle(event)
             }

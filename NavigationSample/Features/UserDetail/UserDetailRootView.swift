@@ -9,7 +9,7 @@ import SwiftUI
 ///
 /// 手段2: NavigationStack は Feature の Root にのみ置く
 ///
-/// UserDetailRouter を生成し、子 View にバケツリレーで渡す。
+/// router を受け取り、子 View にバケツリレーで渡す。
 /// router 1つだけをバケツリレーすることで、引数の増加を抑制。
 struct UserDetailRootView: View {
     /// Feature 内ルーティング（path と modal を管理）
@@ -18,8 +18,8 @@ struct UserDetailRootView: View {
     /// App層へのイベント通知
     let onEvent: (UserDetailEvent) -> Void
 
-    init(user: User, onEvent: @escaping (UserDetailEvent) -> Void) {
-        self._router = State(initialValue: UserDetailRouter(user: user))
+    init(router: UserDetailRouter, onEvent: @escaping (UserDetailEvent) -> Void) {
+        self._router = State(initialValue: router)
         self.onEvent = onEvent
     }
 
@@ -60,7 +60,7 @@ struct UserDetailRootView: View {
 
 #Preview {
     UserDetailRootView(
-        user: User.samples[0],
+        router: UserDetailRouter(user: User.samples[0]),
         onEvent: { _ in }
     )
 }
