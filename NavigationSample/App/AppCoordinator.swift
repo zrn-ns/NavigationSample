@@ -53,26 +53,7 @@ final class AppCoordinator {
         }
     }
 
-    func handle(_ event: LoginEvent) {
-        switch event {
-        case .completed:
-            dismissModal()
-        case .cancelled:
-            dismissModal()
-        }
-    }
-
     // MARK: - Modal Management
-
-    private func presentLogin() {
-        let loginRootView = LoginRootView(onEvent: { [weak self] event in
-            self?.handle(event)
-        })
-        let hostingController = UIHostingController(rootView: loginRootView)
-        hostingController.modalPresentationStyle = .fullScreen
-        tabBarController?.present(hostingController, animated: true)
-        currentModal = .login
-    }
 
     /// 手段8: 同一 Feature を異なる表示手段で表示する
     /// Home: push 風トランジション + スワイプ dismiss

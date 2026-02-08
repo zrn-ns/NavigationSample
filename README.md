@@ -94,16 +94,6 @@ NavigationSample/
 │   │       ├── SettingsView.swift
 │   │       └── SettingsDetailView.swift
 │   │
-│   └── Login/                      # SwiftUI ベース
-│       ├── LoginRoute.swift
-│       ├── LoginEvent.swift
-│       ├── LoginRouter.swift
-│       ├── LoginRootView.swift
-│       └── Views/
-│           ├── LoginStartView.swift
-│           ├── LoginCompleteView.swift
-│           └── LoginFailureView.swift
-│
 └── Shared/
     └── Models/
         └── User.swift              # ユーザモデル
@@ -173,7 +163,6 @@ UIKit App層
 - **パターン A**: SwiftUI 詳細画面から UIKit 画面を modal 表示
 - **Settings Feature**: 設定項目 → 詳細画面への push/pop 遷移
 - **Tab 切り替え**: Home ↔ Settings のタブ切り替え
-- **Login Modal**: 設定からログインモーダル表示 → 完了/キャンセルで自動クローズ
 
 ## ライセンス
 

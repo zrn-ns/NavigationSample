@@ -131,48 +131,4 @@ enum ScreenDesignInfoProvider {
         """
     )
 
-    // MARK: - Login Feature (SwiftUI Modal)
-
-    static let loginStart = ScreenDesignInfo(
-        id: "loginStart",
-        screenName: "ログイン開始",
-        framework: .swiftUI,
-        layer: .view,
-        rootViewName: "LoginRootView",
-        patterns: [.patternC, .featureRoot, .featurePush],
-        appliedPrinciples: [.s1, .s2, .c1, .c3, .p2, .r1, .e1, .e2],
-        description: """
-        Login Feature の起点画面。App 層から modal で表示される独立した文脈（C3, P2）。
-        ログイン成功/失敗で Feature 内 push 遷移し、キャンセルは Event で App 層に通知する（E2）。
-        """
-    )
-
-    static let loginComplete = ScreenDesignInfo(
-        id: "loginComplete",
-        screenName: "ログイン完了",
-        framework: .swiftUI,
-        layer: .view,
-        rootViewName: "LoginCompleteView",
-        patterns: [.featurePush],
-        appliedPrinciples: [.s1, .s2, .f1, .r1, .e1, .e2],
-        description: """
-        Login Feature 内で push 遷移で表示される完了画面。
-        「閉じる」ボタンは Event（.completed）を送信し、App 層が modal を閉じる（E2, R2）。
-        View 自身は dismiss を呼ばない。
-        """
-    )
-
-    static let loginFailure = ScreenDesignInfo(
-        id: "loginFailure",
-        screenName: "ログイン失敗",
-        framework: .swiftUI,
-        layer: .view,
-        rootViewName: "LoginFailureView",
-        patterns: [.featurePush],
-        appliedPrinciples: [.s1, .s2, .f1, .r1],
-        description: """
-        Login Feature 内で push 遷移で表示されるエラー画面。
-        「戻る」ボタンで Feature 内の前画面に戻る（LoginRouter.goBack()）。
-        """
-    )
 }
