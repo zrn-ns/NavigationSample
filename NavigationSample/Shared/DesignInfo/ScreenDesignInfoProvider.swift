@@ -20,6 +20,7 @@ enum ScreenDesignInfoProvider {
         appliedPrinciples: [.s1, .s2, .r1, .r2, .e2],
         description: """
         UIKit の UICollectionView でユーザ一覧をグリッド表示。
+        各セルは UIHostingConfiguration を使い SwiftUI で実装している。
         セル選択時に UserGridCoordinator を介して SwiftUI の UserDetail Feature を \
         fullScreenModal + push 風アニメーションで表示する（パターン B）。
         """
