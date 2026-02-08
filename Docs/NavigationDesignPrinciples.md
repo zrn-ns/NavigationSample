@@ -605,43 +605,70 @@ final class MainTabBarController: UITabBarController {
 
 本プロジェクトの基本構成（UIKit App 層 + SwiftUI Feature 層）以外にも、以下の連携パターンが考えられる。
 
-##### パターン A: SwiftUI Feature 内で UIKit 画面を表示
+##### パターン A: SwiftUI Feature 内で UIKit 画面を modal 表示
 
-SwiftUI の NavigationStack 内で、特定の画面だけ UIKit の UIViewController を使用したい場合。
+SwiftUI の Feature から UIKit の画面を表示したい場合、**modal で表示**するのが推奨パターン。
+
+**理由:**
+- 既存の UIKit 画面では `navigationController?.pushViewController()` で直接遷移していることが多い
+- これを SwiftUI の NavigationStack の path 管理に統合するのは改修コストが高い
+- modal であれば UIKit 側の遷移ロジックを変更せずに統合できる
 
 ```swift
-// UIViewControllerRepresentable でラップ
-struct LegacyDetailViewRepresentable: UIViewControllerRepresentable {
-    let itemId: Item.ID
+// UINavigationController でラップして modal 表示
+struct LegacyItemDetailModalView: View {
+    let item: Item
+    let onDismiss: () -> Void
 
-    func makeUIViewController(context: Context) -> LegacyDetailViewController {
-        LegacyDetailViewController(itemId: itemId)
+    var body: some View {
+        LegacyNavigationControllerRepresentable(
+            rootViewController: LegacyItemDetailViewController(
+                item: item,
+                onDismiss: onDismiss
+            )
+        )
+        .ignoresSafeArea()
+    }
+}
+
+// UINavigationController を SwiftUI でラップ
+struct LegacyNavigationControllerRepresentable: UIViewControllerRepresentable {
+    let rootViewController: UIViewController
+
+    func makeUIViewController(context: Context) -> UINavigationController {
+        UINavigationController(rootViewController: rootViewController)
     }
 
-    func updateUIViewController(_ uiViewController: LegacyDetailViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
 }
 
-// Route で使用
-enum HomeRoute: Hashable {
-    case itemDetail(Item.ID)
-    case legacyDetail(Item.ID)  // UIKit 画面
+// Modal として定義
+enum HomeModal: Identifiable, Hashable {
+    case edit(Item.ID)
+    case legacyItemDetail(Item.ID)  // UIKit 画面
+    var id: Self { self }
 }
 
-// navigationDestination で分岐
-.navigationDestination(for: HomeRoute.self) { route in
-    switch route {
-    case .itemDetail(let id):
-        HomeItemDetailView(itemId: id)
-    case .legacyDetail(let id):
-        LegacyDetailViewRepresentable(itemId: id)
+// sheet で表示
+.sheet(item: $router.modal) { modal in
+    switch modal {
+    case .legacyItemDetail(let itemId):
+        if let item = Item.samples.first(where: { $0.id == itemId }) {
+            LegacyItemDetailModalView(
+                item: item,
+                onDismiss: { router.dismissModal() }
+            )
+        }
+    // ...
     }
 }
 ```
 
 **ポイント:**
-- UIViewControllerRepresentable で UIViewController を SwiftUI View としてラップ
-- NavigationStack の path 管理はそのまま維持
-- UIKit 画面も Route として型安全に管理可能
+- UIKit 画面を UINavigationController でラップして modal 表示
+- UIKit 側で自由に push/pop できる（SwiftUI の path 管理と独立）
+- 閉じるときだけ SwiftUI 側に `onDismiss` で通知
+- 既存の UIKit 画面への影響が最小限
 
 ##### パターン B: UIKit 画面から SwiftUI Feature を表示
 
@@ -750,6 +777,7 @@ final class HybridViewController: UIViewController {
 
 | 日付 | 内容 |
 |------|------|
+| 2026-02-08 | パターン A を modal 表示パターンに変更（UIKit 画面の既存遷移ロジックを活かすため） |
 | 2026-02-08 | 課題3「UIKit との混在パターン」を解決済みに更新、App 層を UIKit に変更 |
 | 2026-02-06 | 課題1「NavigationPath vs [Route] の選択基準」を解決済みに更新 |
 | 2026-02-05 | 初版作成、課題セクション追加 |
