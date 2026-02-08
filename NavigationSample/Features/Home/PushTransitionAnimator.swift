@@ -172,17 +172,39 @@ final class EdgeSwipeDismissalInteractor: UIPercentDrivenInteractiveTransition {
             break
         }
     }
+
+    /// VC の子階層から UINavigationController を探す
+    private func findNavigationController(in viewController: UIViewController) -> UINavigationController? {
+        for child in viewController.children {
+            if let nav = child as? UINavigationController {
+                return nav
+            }
+            if let found = findNavigationController(in: child) {
+                return found
+            }
+        }
+        return nil
+    }
 }
 
 // MARK: - UIGestureRecognizerDelegate
 
 extension EdgeSwipeDismissalInteractor: UIGestureRecognizerDelegate {
-    /// NavigationStack 内部のエッジスワイプ（pop ジェスチャー）を優先させる
+    /// NavigationStack 内部の pop ジェスチャーを優先させる
+    ///
+    /// iOS 26 では NavigationStack の pop ジェスチャーが UIPanGestureRecognizer に変更されたため、
+    /// 型ではなく interactivePopGestureRecognizer のインスタンス比較で判定する。
+    /// - root 画面: interactivePopGestureRecognizer が fail → dismiss ジェスチャーが発火
+    /// - pushed 画面: interactivePopGestureRecognizer が succeed → dismiss は発火しない
     func gestureRecognizer(
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
-        // 他の UIScreenEdgePanGestureRecognizer（NavigationStack の pop）が優先
-        otherGestureRecognizer is UIScreenEdgePanGestureRecognizer
+        if let vc = viewController,
+           let navController = findNavigationController(in: vc),
+           otherGestureRecognizer === navController.interactivePopGestureRecognizer {
+            return true
+        }
+        return false
     }
 }
