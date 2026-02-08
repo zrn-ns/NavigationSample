@@ -49,6 +49,8 @@ final class UserGridCoordinator {
         hostingController.modalPresentationStyle = .fullScreen
         hostingController.transitioningDelegate = transitioningDelegate
 
+        transitioningDelegate.dismissalInteractor.attach(to: hostingController)
+
         presentedDetailVC = hostingController
         navigationController.present(hostingController, animated: true)
     }

@@ -97,6 +97,8 @@ final class PushTransitionAnimator: NSObject, UIViewControllerAnimatedTransition
 
 /// fullScreenModal の push 風トランジションを提供するデリゲート
 final class PushTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
+    let dismissalInteractor = EdgeSwipeDismissalInteractor()
+
     func animationController(
         forPresented presented: UIViewController,
         presenting: UIViewController,
@@ -107,5 +109,80 @@ final class PushTransitioningDelegate: NSObject, UIViewControllerTransitioningDe
 
     func animationController(forDismissed dismissed: UIViewController) -> (any UIViewControllerAnimatedTransitioning)? {
         PushTransitionAnimator(isPresenting: false)
+    }
+
+    func interactionControllerForDismissal(
+        using animator: any UIViewControllerAnimatedTransitioning
+    ) -> (any UIViewControllerInteractiveTransitioning)? {
+        // エッジスワイプ中のみインタラクティブトランジションを返す
+        // ボタンでの dismiss 時は nil を返し、従来通り非インタラクティブ
+        dismissalInteractor.isInteracting ? dismissalInteractor : nil
+    }
+}
+
+// MARK: - Edge Swipe Dismissal
+
+/// エッジスワイプによるインタラクティブ dismiss を管理する
+final class EdgeSwipeDismissalInteractor: UIPercentDrivenInteractiveTransition {
+    private(set) var isInteracting = false
+    private weak var viewController: UIViewController?
+
+    /// 対象の VC にエッジスワイプジェスチャーを追加する
+    func attach(to viewController: UIViewController) {
+        self.viewController = viewController
+
+        let edgePan = UIScreenEdgePanGestureRecognizer(
+            target: self,
+            action: #selector(handleEdgePan(_:))
+        )
+        edgePan.edges = .left
+        edgePan.delegate = self
+        viewController.view.addGestureRecognizer(edgePan)
+    }
+
+    @objc private func handleEdgePan(_ gesture: UIScreenEdgePanGestureRecognizer) {
+        guard let view = gesture.view else { return }
+
+        let translation = gesture.translation(in: view)
+        let progress = max(0, min(1, translation.x / view.bounds.width))
+
+        switch gesture.state {
+        case .began:
+            isInteracting = true
+            viewController?.dismiss(animated: true)
+
+        case .changed:
+            update(progress)
+
+        case .ended:
+            isInteracting = false
+            let velocity = gesture.velocity(in: view).x
+            // 速度が十分、または進行度が50%以上なら完了
+            if velocity > 300 || progress > 0.5 {
+                finish()
+            } else {
+                cancel()
+            }
+
+        case .cancelled:
+            isInteracting = false
+            cancel()
+
+        default:
+            break
+        }
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+
+extension EdgeSwipeDismissalInteractor: UIGestureRecognizerDelegate {
+    /// NavigationStack 内部のエッジスワイプ（pop ジェスチャー）を優先させる
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        // 他の UIScreenEdgePanGestureRecognizer（NavigationStack の pop）が優先
+        otherGestureRecognizer is UIScreenEdgePanGestureRecognizer
     }
 }
