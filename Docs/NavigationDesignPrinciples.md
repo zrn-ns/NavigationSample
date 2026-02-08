@@ -601,6 +601,123 @@ final class MainTabBarController: UITabBarController {
 
 各 Feature（Home, Settings, Login）は SwiftUI のまま維持し、UIHostingController でラップ。
 
+#### 追加の連携パターン
+
+本プロジェクトの基本構成（UIKit App 層 + SwiftUI Feature 層）以外にも、以下の連携パターンが考えられる。
+
+##### パターン A: SwiftUI Feature 内で UIKit 画面を表示
+
+SwiftUI の NavigationStack 内で、特定の画面だけ UIKit の UIViewController を使用したい場合。
+
+```swift
+// UIViewControllerRepresentable でラップ
+struct LegacyDetailViewRepresentable: UIViewControllerRepresentable {
+    let itemId: Item.ID
+
+    func makeUIViewController(context: Context) -> LegacyDetailViewController {
+        LegacyDetailViewController(itemId: itemId)
+    }
+
+    func updateUIViewController(_ uiViewController: LegacyDetailViewController, context: Context) {}
+}
+
+// Route で使用
+enum HomeRoute: Hashable {
+    case itemDetail(Item.ID)
+    case legacyDetail(Item.ID)  // UIKit 画面
+}
+
+// navigationDestination で分岐
+.navigationDestination(for: HomeRoute.self) { route in
+    switch route {
+    case .itemDetail(let id):
+        HomeItemDetailView(itemId: id)
+    case .legacyDetail(let id):
+        LegacyDetailViewRepresentable(itemId: id)
+    }
+}
+```
+
+**ポイント:**
+- UIViewControllerRepresentable で UIViewController を SwiftUI View としてラップ
+- NavigationStack の path 管理はそのまま維持
+- UIKit 画面も Route として型安全に管理可能
+
+##### パターン B: UIKit 画面から SwiftUI Feature を表示
+
+UIKit の UIViewController から SwiftUI で書かれた Feature を push または present する場合。
+
+```swift
+// UIKit ViewController から SwiftUI Feature を push
+final class SomeViewController: UIViewController {
+    private func showSwiftUIFeature() {
+        let swiftUIView = SettingsRootView(onEvent: { [weak self] event in
+            self?.handleSettingsEvent(event)
+        })
+        let hostingController = UIHostingController(rootView: swiftUIView)
+        navigationController?.pushViewController(hostingController, animated: true)
+    }
+
+    private func presentSwiftUIFeature() {
+        let swiftUIView = LoginRootView(onEvent: { [weak self] event in
+            self?.handleLoginEvent(event)
+        })
+        let hostingController = UIHostingController(rootView: swiftUIView)
+        hostingController.modalPresentationStyle = .fullScreen
+        present(hostingController, animated: true)
+    }
+}
+```
+
+**ポイント:**
+- UIHostingController で SwiftUI View をラップして push/present
+- onEvent クロージャで UIKit 側にイベントを伝達
+- SwiftUI Feature 内の NavigationStack は独立して機能
+
+##### パターン C: UIKit 画面の一部を SwiftUI で構築
+
+UIKit の UIViewController 内の一部のビューだけ SwiftUI で書く場合。
+
+```swift
+final class HybridViewController: UIViewController {
+    private var hostingController: UIHostingController<SomeSwiftUIView>?
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupSwiftUIView()
+    }
+
+    private func setupSwiftUIView() {
+        let swiftUIView = SomeSwiftUIView(
+            onTap: { [weak self] in
+                self?.handleTap()
+            }
+        )
+        let hosting = UIHostingController(rootView: swiftUIView)
+
+        addChild(hosting)
+        view.addSubview(hosting.view)
+        hosting.didMove(toParent: self)
+
+        // Auto Layout 設定
+        hosting.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            hosting.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            hosting.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hosting.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            hosting.view.heightAnchor.constraint(equalToConstant: 200)
+        ])
+
+        hostingController = hosting
+    }
+}
+```
+
+**ポイント:**
+- UIHostingController を child view controller として追加
+- Auto Layout で SwiftUI View のサイズ・位置を制御
+- SwiftUI View からのイベントはクロージャで UIKit 側に伝達
+
 ---
 
 ### 課題4: エラーハンドリングと文脈遷移
