@@ -16,7 +16,7 @@ enum ScreenDesignInfoProvider {
         framework: .uiKit,
         layer: .feature,
         rootViewName: "UserGridViewController",
-        patterns: [.patternB],
+        patterns: [.patternB, .patternD],
         appliedPrinciples: [.s1, .s2, .r1, .r2, .e2],
         description: """
         UIKit の UICollectionView でユーザ一覧をグリッド表示。
@@ -105,7 +105,7 @@ enum ScreenDesignInfoProvider {
         layer: .view,
         rootViewName: "SettingsRootView",
         patterns: [.featureRoot],
-        appliedPrinciples: [.s1, .s2, .r1, .e2],
+        appliedPrinciples: [.s1, .s2, .f2, .r1, .e2],
         description: """
         Settings Feature の起点画面。Feature 内に push 遷移を持たず、
         Event 委譲のみで App 層と連携する最小構成の Feature。
@@ -123,7 +123,7 @@ enum ScreenDesignInfoProvider {
         framework: .swiftUI,
         layer: .view,
         rootViewName: "LoginRootView",
-        patterns: [.featureRoot, .featurePush],
+        patterns: [.patternC, .featureRoot, .featurePush],
         appliedPrinciples: [.s1, .s2, .c1, .c3, .p2, .r1, .e1, .e2],
         description: """
         Login Feature の起点画面。App 層から modal で表示される独立した文脈（C3, P2）。

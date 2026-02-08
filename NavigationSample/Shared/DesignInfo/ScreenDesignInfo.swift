@@ -59,7 +59,6 @@ struct ScreenDesignInfo: Identifiable {
         // 責務分離
         case r1 = "R1: View無決定権原則"
         case r2 = "R2: 開始者終了原則"
-        case r3 = "R3: 上位強制終了原則"
         // 結果伝達
         case e1 = "E1: 終了結果原則"
         case e2 = "E2: Event委譲原則"
@@ -71,7 +70,7 @@ struct ScreenDesignInfo: Identifiable {
             case .c1, .c2, .c3: return "文脈構造"
             case .f1, .f2, .f3: return "Feature境界"
             case .p1, .p2: return "状態分離"
-            case .r1, .r2, .r3: return "責務分離"
+            case .r1, .r2: return "責務分離"
             case .e1, .e2: return "結果伝達"
             }
         }
@@ -103,8 +102,6 @@ struct ScreenDesignInfo: Identifiable {
                 return "View は遷移の決定権を持たない"
             case .r2:
                 return "文脈を開始した主体が、文脈を終了させる責務を持つ"
-            case .r3:
-                return "文脈を跨ぐ「強制的な終了」は、常に上位レイヤーの責務である"
             case .e1:
                 return "「画面を閉じる」とは「文脈を終了させる」ことであり、結果を伴う"
             case .e2:
