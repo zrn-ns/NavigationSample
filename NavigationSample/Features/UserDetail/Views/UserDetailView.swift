@@ -77,21 +77,17 @@ struct UserDetailView: View {
             .buttonStyle(.bordered)
 
             Button {
-                router.showLegacyProfile()
+                router.showLikeSend()
             } label: {
-                Label("レガシー画面で表示", systemImage: "rectangle.portrait.on.rectangle.portrait")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.bordered)
-
-            Button {
-                router.like()
-            } label: {
-                Label("いいね！", systemImage: "heart.fill")
-                    .frame(maxWidth: .infinity)
+                Label(
+                    router.isLiked ? "いいね済" : "いいね！",
+                    systemImage: "heart.fill"
+                )
+                .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .tint(.pink)
+            .tint(router.isLiked ? .gray : .pink)
+            .disabled(router.isLiked)
         }
     }
 }

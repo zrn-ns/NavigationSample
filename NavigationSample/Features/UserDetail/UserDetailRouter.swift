@@ -15,6 +15,9 @@ final class UserDetailRouter {
     /// 表示対象のユーザ
     let user: User
 
+    /// いいね済かどうか
+    var isLiked: Bool = false
+
     /// Feature 内の push 遷移状態
     var path: [UserDetailRoute] = []
 
@@ -44,9 +47,9 @@ final class UserDetailRouter {
         navigate(to: .photoDetail(photoId: photoId))
     }
 
-    /// レガシープロフィール画面をモーダルで表示（パターン A）
-    func showLegacyProfile() {
-        modal = .legacyProfile
+    /// いいね送信画面をモーダルで表示（パターン A）
+    func showLikeSend() {
+        modal = .likeSend
     }
 
     /// モーダルを閉じる
@@ -65,7 +68,9 @@ final class UserDetailRouter {
     }
 
     /// いいねを送る
-    func like() {
-        sendEvent(.liked(userId: user.id))
+    func sendLike(_ type: LikeType) {
+        modal = nil
+        isLiked = true
+        sendEvent(.liked(userId: user.id, type: type))
     }
 }

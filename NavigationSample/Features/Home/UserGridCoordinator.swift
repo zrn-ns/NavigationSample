@@ -60,11 +60,9 @@ final class UserGridCoordinator {
             presentedDetailVC?.dismiss(animated: true)
             presentedDetailVC = nil
 
-        case .liked(let userId):
-            // いいね処理（ここでは単純に dismiss して戻る）
-            print("いいねを送りました: \(userId)")
-            presentedDetailVC?.dismiss(animated: true)
-            presentedDetailVC = nil
+        case .liked(let userId, let type):
+            // いいね処理（ログ出力のみ。詳細画面は閉じない）
+            print("いいねを送りました: \(userId)（\(type.displayName) \(type.cost)pt）")
         }
     }
 }

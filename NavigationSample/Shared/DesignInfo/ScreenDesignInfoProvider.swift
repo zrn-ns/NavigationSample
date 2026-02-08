@@ -37,7 +37,7 @@ enum ScreenDesignInfoProvider {
         appliedPrinciples: [.s1, .s2, .c1, .c2, .f1, .p1, .r1, .r2],
         description: """
         UserDetail Feature の起点画面。NavigationStack の root として機能し、
-        Feature 内で push 遷移（写真一覧・写真詳細）と modal 表示（レガシー画面）を管理する。
+        Feature 内で push 遷移（写真一覧・写真詳細）と modal 表示（いいね送信画面）を管理する。
         UserDetailRouter がバケツリレーで状態を管理。
         """
     )
@@ -71,33 +71,18 @@ enum ScreenDesignInfoProvider {
         """
     )
 
-    static let legacyProfile = ScreenDesignInfo(
-        id: "legacyProfile",
-        screenName: "レガシープロフィール (1画面目)",
+    static let likeSend = ScreenDesignInfo(
+        id: "likeSend",
+        screenName: "いいね送信",
         framework: .uiKit,
         layer: .view,
-        rootViewName: "LegacyProfileViewController",
+        rootViewName: "LikeSendViewController",
         patterns: [.patternA],
         appliedPrinciples: [.c1, .c3, .p2, .r2, .e1],
         description: """
-        SwiftUI の UserDetail Feature から modal で表示される UIKit 画面（パターン A）。
-        UINavigationController でラップされ、UIKit 側で自由に push/pop 可能。
-        閉じるときは onDismiss で SwiftUI 側に通知する。
-        """
-    )
-
-    static let legacyProfileSecond = ScreenDesignInfo(
-        id: "legacyProfileSecond",
-        screenName: "レガシープロフィール (2画面目)",
-        framework: .uiKit,
-        layer: .view,
-        rootViewName: "LegacyProfileSecondViewController",
-        patterns: [.patternA],
-        appliedPrinciples: [.c1, .c3, .f1, .r2],
-        description: """
-        LegacyProfileViewController から UIKit の push で遷移した2画面目。
-        SwiftUI の NavigationStack とは独立した UINavigationController の文脈で動作する。
-        戻るボタンで UINavigationController が pop を処理する。
+        SwiftUI の UserDetail Feature からセミモーダルで表示される UIKit 画面（パターン A）。
+        いいね（1pt）またはスペシャルいいね（3pt）を選択して送信する。
+        送信完了は onLikeSent コールバックで SwiftUI 側に通知する。
         """
     )
 

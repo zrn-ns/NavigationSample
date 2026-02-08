@@ -14,6 +14,6 @@ enum UserDetailEvent {
     /// 詳細画面が閉じられた（戻るボタン等）
     case dismissed
 
-    /// いいねボタンが押された
-    case liked(userId: User.ID)
+    /// いいねが送られた
+    case liked(userId: User.ID, type: LikeType)
 }
