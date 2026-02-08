@@ -158,6 +158,23 @@ TabView {
 
 タブ切り替え時、選択されていないタブの NavigationStack は「存在するが非アクティブ」となる。
 
+**具体例: UITabBarController 内の NavigationStack**
+
+```swift
+// UIKit: UITabBarController
+final class MainTabBarController: UITabBarController {
+    private func setupTabs() {
+        // 各タブが UIHostingController で SwiftUI View をラップ
+        viewControllers = [
+            UIHostingController(rootView: HomeRootView(...)),    // 内部に NavigationStack
+            UIHostingController(rootView: SettingsRootView(...)) // 内部に NavigationStack
+        ]
+    }
+}
+```
+
+UIKit の UITabBarController でも同様に、選択されていないタブの NavigationStack は非アクティブとなる。
+
 ---
 
 ### 原則7
@@ -330,7 +347,9 @@ func handle(_ event: HomeEvent) {
 | Feature 内 modal | `modal = .xxx` | RootView |
 | modal dismiss | `modal = nil` | RootView |
 | Feature 跨ぎ | `send(Event)` | View |
-| App modal | `appModal = .xxx` | App層 |
+| App modal（SwiftUI） | `appModal = .xxx` | App層 |
+| App modal（UIKit） | `present(hostingController, animated:)` | Coordinator |
+| modal dismiss（UIKit） | `dismiss(animated:)` | Coordinator |
 | 上位 push | `appPath.append(route)` | App層 |
 | 文脈終了の意図表明 | `dismiss()` | View |
 

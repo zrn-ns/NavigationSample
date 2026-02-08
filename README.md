@@ -102,19 +102,20 @@ NavigationSample/
 ### 連携フロー
 
 ```
-┌──────────────────────────────────────────────────┐
-│                  App Layer                        │
-│  AppState.handle(event) → 状態変更 → UI更新      │
-└───────────────────┬──────────────────────────────┘
-                    │ Event
-┌───────────────────▼──────────────────────────────┐
-│               Feature Layer                       │
-│  HomeRootView ─ path操作 ─ HomeView              │
-│       │                         │                 │
-│       │ onEvent                 │ onNavigate      │
-│       ▼                         ▼                 │
-│  App層へ委譲               path.append()          │
-└──────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                    App Layer (UIKit)                      │
+│  AppCoordinator.handle(event) → 状態変更 → UI更新        │
+│  MainTabBarController - タブ管理、Modal表示              │
+└───────────────────────┬──────────────────────────────────┘
+                        │ Event
+┌───────────────────────▼──────────────────────────────────┐
+│              Feature Layer (SwiftUI)                      │
+│  UIHostingController ─ HomeRootView ─ HomeView           │
+│                             │               │             │
+│                             │ onEvent       │ onNavigate  │
+│                             ▼               ▼             │
+│                        App層へ委譲    path.append()       │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ### 動作確認できる機能
