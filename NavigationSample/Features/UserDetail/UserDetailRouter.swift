@@ -12,8 +12,19 @@ import SwiftUI
 @MainActor
 @Observable
 final class UserDetailRouter {
+    /// 表示モード
+    enum DisplayMode {
+        /// 通常表示（他ユーザの詳細）
+        case standard
+        /// 自分のプロフィール表示
+        case me
+    }
+
     /// 表示対象のユーザ
     let user: User
+
+    /// 表示モード
+    let displayMode: DisplayMode
 
     /// いいね済かどうか
     var isLiked: Bool = false
@@ -27,8 +38,9 @@ final class UserDetailRouter {
     /// App 層へのイベント通知
     var onEvent: ((UserDetailEvent) -> Void)?
 
-    init(user: User, onEvent: ((UserDetailEvent) -> Void)? = nil) {
+    init(user: User, displayMode: DisplayMode = .standard, onEvent: ((UserDetailEvent) -> Void)? = nil) {
         self.user = user
+        self.displayMode = displayMode
         self.onEvent = onEvent
     }
 

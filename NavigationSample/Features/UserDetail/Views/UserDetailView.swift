@@ -21,13 +21,24 @@ struct UserDetailView: View {
         .navigationTitle(router.user.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    router.dismiss()
-                } label: {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                        Text("戻る")
+            if router.displayMode == .standard {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        router.dismiss()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left")
+                            Text("戻る")
+                        }
+                    }
+                }
+            }
+            if router.displayMode == .me {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        router.dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
                     }
                 }
             }
@@ -76,18 +87,20 @@ struct UserDetailView: View {
             }
             .buttonStyle(.bordered)
 
-            Button {
-                router.showLikeSend()
-            } label: {
-                Label(
-                    router.isLiked ? "いいね済" : "いいね！",
-                    systemImage: "heart.fill"
-                )
-                .frame(maxWidth: .infinity)
+            if router.displayMode == .standard {
+                Button {
+                    router.showLikeSend()
+                } label: {
+                    Label(
+                        router.isLiked ? "いいね済" : "いいね！",
+                        systemImage: "heart.fill"
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(router.isLiked ? .gray : .pink)
+                .disabled(router.isLiked)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(router.isLiked ? .gray : .pink)
-            .disabled(router.isLiked)
         }
     }
 }
