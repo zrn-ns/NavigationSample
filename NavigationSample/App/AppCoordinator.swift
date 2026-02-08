@@ -48,8 +48,8 @@ final class AppCoordinator {
         switch event {
         case .openHome:
             tabBarController?.selectedIndex = 0
-        case .requireLogin:
-            presentLogin()
+        case .showProfilePreview:
+            presentProfilePreview()
         }
     }
 
@@ -72,6 +72,33 @@ final class AppCoordinator {
         hostingController.modalPresentationStyle = .fullScreen
         tabBarController?.present(hostingController, animated: true)
         currentModal = .login
+    }
+
+    /// 手段8: 同一 Feature を異なる表示手段で表示する
+    /// Home: push 風トランジション + スワイプ dismiss
+    /// Settings: 通常 fullScreenModal（スワイプ dismiss なし）
+    private func presentProfilePreview() {
+        let router = UserDetailRouter(user: User.myself)
+        let detailRootView = UserDetailRootView(
+            router: router,
+            onEvent: { [weak self] event in
+                self?.handleProfilePreviewEvent(event)
+            }
+        )
+        let hostingController = UIHostingController(rootView: detailRootView)
+        hostingController.modalPresentationStyle = .fullScreen
+        tabBarController?.present(hostingController, animated: true)
+        currentModal = .profilePreview
+    }
+
+    private func handleProfilePreviewEvent(_ event: UserDetailEvent) {
+        switch event {
+        case .dismissed:
+            dismissModal()
+        case .liked:
+            // プレビューなのでいいねは無視
+            break
+        }
     }
 
     private func dismissModal() {

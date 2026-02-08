@@ -12,43 +12,30 @@ struct SettingsView: View {
     /// Feature 内ルーティング（バケツリレー）
     let router: SettingsRouter
 
-    private let settingsItems = [
-        "アカウント",
-        "通知",
-        "プライバシー",
-        "一般"
-    ]
-
     var body: some View {
         List {
             Section {
-                ForEach(settingsItems, id: \.self) { item in
-                    Button {
-                        router.navigate(to: .detail(item))
-                    } label: {
-                        HStack {
-                            Text(item)
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundStyle(.secondary)
-                        }
+                Button {
+                    router.sendEvent(.showProfilePreview)
+                } label: {
+                    HStack {
+                        Text("プロフィールプレビュー")
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.secondary)
                     }
-                    .foregroundStyle(.primary)
                 }
+                .foregroundStyle(.primary)
             } header: {
-                Text("設定項目")
+                Text("プロフィール")
             }
 
             Section {
-                Button("ログイン") {
-                    router.sendEvent(.requireLogin)
-                }
-
-                Button("ホームに戻る") {
+                Button {
                     router.sendEvent(.openHome)
+                } label: {
+                    Label("マッチするにはいいねしよう！", systemImage: "heart.fill")
                 }
-            } header: {
-                Text("アクション")
             }
         }
         .navigationTitle("設定")

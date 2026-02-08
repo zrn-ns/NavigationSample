@@ -47,6 +47,20 @@ extension User {
     }
 }
 
+// MARK: - 自分のプロフィール（プレビュー用）
+
+extension User {
+    static let myself = User(
+        name: "自分",
+        age: 25,
+        bio: "プロフィールのプレビューです",
+        imageURL: "person.circle.fill",
+        photos: [
+            Photo(imageURL: "photo.fill", caption: "プロフィール写真"),
+        ]
+    )
+}
+
 // MARK: - サンプルデータ
 
 extension User {

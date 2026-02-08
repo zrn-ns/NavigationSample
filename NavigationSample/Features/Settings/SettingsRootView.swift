@@ -12,21 +12,15 @@ import SwiftUI
 /// SettingsRouter を生成し、子 View にバケツリレーで渡す。
 /// router 1つだけをバケツリレーすることで、引数の増加を抑制。
 struct SettingsRootView: View {
-    /// Feature 内ルーティング（path を管理）
+    /// Feature 内ルーティング
     @State private var router = SettingsRouter()
 
     /// App層へのイベント通知
     let onEvent: (SettingsEvent) -> Void
 
     var body: some View {
-        NavigationStack(path: $router.path) {
+        NavigationStack {
             SettingsView(router: router)
-                .navigationDestination(for: SettingsRoute.self) { route in
-                    switch route {
-                    case .detail(let title):
-                        SettingsDetailView(title: title, router: router)
-                    }
-                }
         }
         .onAppear {
             router.onEvent = onEvent

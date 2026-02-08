@@ -98,27 +98,14 @@ enum ScreenDesignInfoProvider {
         framework: .swiftUI,
         layer: .view,
         rootViewName: "SettingsRootView",
-        patterns: [.featureRoot, .featurePush],
-        appliedPrinciples: [.s1, .s2, .c1, .c2, .f1, .p1, .r1, .e2],
+        patterns: [.featureRoot],
+        appliedPrinciples: [.s1, .s2, .r1, .e2],
         description: """
-        Settings Feature の起点画面。NavigationStack の root として機能し、
-        Feature 内で push 遷移（設定詳細）を管理する。
-        「ログイン」ボタンは Event を上位（App 層）に委譲して modal 表示を要求する（E2）。
-        """
-    )
-
-    static let settingsDetail = ScreenDesignInfo(
-        id: "settingsDetail",
-        screenName: "設定詳細",
-        framework: .swiftUI,
-        layer: .view,
-        rootViewName: "SettingsDetailView",
-        patterns: [.featurePush],
-        appliedPrinciples: [.s1, .s2, .f1, .f3, .r1, .r2],
-        description: """
-        Settings Feature 内で push 遷移で表示される詳細画面。
-        @Environment(\\.dismiss) で「文脈終了の意図」を表明し、
-        SwiftUI が適切な方法（pop）で処理する。
+        Settings Feature の起点画面。Feature 内に push 遷移を持たず、
+        Event 委譲のみで App 層と連携する最小構成の Feature。
+        「プロフィールプレビュー」は Event 経由で App 層に fullScreenModal 表示を要求（E2）。
+        同一の UserDetail Feature を Home とは異なる表示手段で表示する（手段8）。
+        「マッチするにはいいねしよう！」はタブ切り替えを Event で委譲する（E2, F2）。
         """
     )
 

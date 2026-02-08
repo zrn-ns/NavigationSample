@@ -11,6 +11,7 @@ import Foundation
 /// - App 文脈 → AppModal
 enum AppModal: Identifiable, Hashable {
     case login
+    case profilePreview
 
     var id: Self { self }
 }

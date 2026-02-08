@@ -10,8 +10,8 @@ import Foundation
 /// 原則9: Viewは遷移の決定権を持たない
 /// 手段6: Feature間遷移はEventとして上位に委譲する
 enum SettingsEvent {
-    /// ホーム画面を開きたい
+    /// ホーム（さがす）タブを開きたい
     case openHome
-    /// ログインが必要
-    case requireLogin
+    /// プロフィールプレビューを表示したい
+    case showProfilePreview
 }
