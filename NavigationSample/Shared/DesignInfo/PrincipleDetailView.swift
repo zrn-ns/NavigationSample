@@ -14,8 +14,14 @@ struct PrincipleDetailView: View {
             VStack(alignment: .leading, spacing: 20) {
                 headerSection
                 detailedExplanationSection
+                if !principleInfo.navigationPatterns.isEmpty {
+                    navigationPatternsSection
+                }
                 if !principleInfo.codeExamples.isEmpty {
                     codeExamplesSection
+                }
+                if !principleInfo.relatedPractices.isEmpty {
+                    relatedPracticesSection
                 }
                 if !principleInfo.appliedScreens.isEmpty {
                     appliedScreensSection
@@ -25,6 +31,9 @@ struct PrincipleDetailView: View {
         }
         .navigationTitle(principleInfo.principle.rawValue)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: PracticeInfo.self) { practice in
+            PracticeDetailView(practiceInfo: practice)
+        }
     }
 
     // MARK: - Sections
@@ -77,6 +86,46 @@ struct PrincipleDetailView: View {
                         .background(Color(.secondarySystemBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
+            }
+        }
+    }
+
+    private var navigationPatternsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionHeader("画面パターン")
+
+            FlowLayout(spacing: 6) {
+                ForEach(principleInfo.navigationPatterns, id: \.self) { pattern in
+                    Text(pattern)
+                        .font(.caption)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color.accentColor.opacity(0.12))
+                        .foregroundStyle(Color.accentColor)
+                        .clipShape(Capsule())
+                }
+            }
+        }
+    }
+
+    private var relatedPracticesSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionHeader("関連する具体的手段")
+
+            ForEach(principleInfo.relatedPractices) { practice in
+                NavigationLink(value: practice) {
+                    HStack {
+                        Text(practice.title)
+                            .font(.subheadline)
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+                .buttonStyle(.plain)
+                .padding(.vertical, 4)
             }
         }
     }

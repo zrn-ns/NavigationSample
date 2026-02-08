@@ -28,4 +28,16 @@ extension PrincipleInfo {
             $0.appliedPrinciples.contains(principle)
         }
     }
+
+    /// この原則が適用される画面パターン（マトリクスから逆引き）
+    var navigationPatterns: [String] {
+        PrincipleInfoProvider.navigationPatternMatrix
+            .filter { $0.principles.contains(principle) }
+            .map { $0.pattern }
+    }
+
+    /// この原則に関連する具体的手段（PracticeInfoProvider から逆引き）
+    var relatedPractices: [PracticeInfo] {
+        PracticeInfoProvider.all.filter { $0.relatedPrinciples.contains(principle) }
+    }
 }

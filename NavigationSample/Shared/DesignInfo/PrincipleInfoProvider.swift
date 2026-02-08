@@ -41,6 +41,17 @@ enum PrincipleInfoProvider {
         all.first { $0.principle == principle }!
     }
 
+    /// 画面パターン別 適用原則マトリクス
+    static let navigationPatternMatrix: [(pattern: String, principles: [ScreenDesignInfo.Principle])] = [
+        ("全画面共通", [.s1, .s2]),
+        ("NavigationStack (push)", [.c1, .c2, .f1, .p1, .r2]),
+        ("Modal 表示", [.c1, .c2, .c3, .p2, .r2, .e1, .e2]),
+        ("Feature 内遷移", [.f1, .f3]),
+        ("Feature 間遷移", [.f2, .e2]),
+        ("View 実装", [.r1, .s2]),
+        ("RootView 設計", [.p1, .p2, .r2]),
+    ]
+
     // MARK: - 状態駆動
 
     static let s1 = PrincipleInfo(
