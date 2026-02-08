@@ -31,7 +31,7 @@ final class LegacyProfileViewController: UIViewController {
     }
 
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .uiKitBackground
 
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -122,7 +122,7 @@ final class LegacyProfileViewController: UIViewController {
 final class LegacyProfileSecondViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .uiKitBackground
         title = "2画面目（UIKit）"
 
         let label = UILabel()

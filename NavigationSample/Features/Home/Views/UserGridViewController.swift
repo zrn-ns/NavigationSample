@@ -15,7 +15,7 @@ final class UserGridViewController: UIViewController {
     private lazy var collectionView: UICollectionView = {
         let layout = createLayout()
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        cv.backgroundColor = .systemBackground
+        cv.backgroundColor = .clear
         cv.register(UserGridCell.self, forCellWithReuseIdentifier: UserGridCell.reuseIdentifier)
         cv.delegate = self
         cv.dataSource = self
@@ -41,7 +41,7 @@ final class UserGridViewController: UIViewController {
 
     private func setupUI() {
         title = "ホーム"
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .uiKitBackground
 
         view.addSubview(collectionView)
         NSLayoutConstraint.activate([

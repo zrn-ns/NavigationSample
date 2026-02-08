@@ -51,6 +51,7 @@ struct SettingsView: View {
                 Text("アクション")
             }
         }
+        .background(Color.swiftUIBackground)
         .navigationTitle("設定")
     }
 }

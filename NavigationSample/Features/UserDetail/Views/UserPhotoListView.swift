@@ -25,6 +25,7 @@ struct UserPhotoListView: View {
             }
             .padding()
         }
+        .background(Color.swiftUIBackground)
         .navigationTitle("写真")
         .navigationBarTitleDisplayMode(.inline)
     }

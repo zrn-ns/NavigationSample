@@ -38,6 +38,7 @@ struct UserPhotoDetailView: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .background(Color.swiftUIBackground)
         .navigationTitle("写真")
         .navigationBarTitleDisplayMode(.inline)
     }
