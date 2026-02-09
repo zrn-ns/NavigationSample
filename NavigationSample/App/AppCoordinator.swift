@@ -60,8 +60,10 @@ final class AppCoordinator {
     /// Settings: 通常 fullScreenModal（スワイプ dismiss なし）
     private func presentProfilePreview() {
         let router = UserDetailRouter(user: User.myself, displayMode: .me)
+        let viewModel = UserDetailViewModel()
         let detailRootView = UserDetailRootView(
             router: router,
+            viewModel: viewModel,
             onEvent: { [weak self] event in
                 self?.handleProfilePreviewEvent(event)
             }

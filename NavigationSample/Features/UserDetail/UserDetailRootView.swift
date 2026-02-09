@@ -15,17 +15,21 @@ struct UserDetailRootView: View {
     /// Feature 内ルーティング（path と modal を管理）
     @State private var router: UserDetailRouter
 
+    /// ビジネスロジック（いいね等の状態を管理）
+    @State private var viewModel: UserDetailViewModel
+
     /// 上位へのイベント通知
     let onEvent: (UserDetailEvent) -> Void
 
-    init(router: UserDetailRouter, onEvent: @escaping (UserDetailEvent) -> Void) {
+    init(router: UserDetailRouter, viewModel: UserDetailViewModel, onEvent: @escaping (UserDetailEvent) -> Void) {
         self._router = State(initialValue: router)
+        self._viewModel = State(initialValue: viewModel)
         self.onEvent = onEvent
     }
 
     var body: some View {
         NavigationStack(path: $router.path) {
-            UserDetailView(router: router)
+            UserDetailView(router: router, viewModel: viewModel)
                 .navigationDestination(for: UserDetailPath.self) { destination in
                     switch destination {
                     case .photos:
@@ -44,7 +48,9 @@ struct UserDetailRootView: View {
                     onEvent: { event in
                         switch event {
                         case .liked(let type):
-                            router.sendLike(type)
+                            router.dismissModal()
+                            viewModel.sendLike(type)
+                            router.sendEvent(.liked(userId: router.user.id, type: type))
                         case .dismissed:
                             router.dismissModal()
                         }
@@ -61,6 +67,7 @@ struct UserDetailRootView: View {
 #Preview {
     UserDetailRootView(
         router: UserDetailRouter(user: User.samples[0]),
+        viewModel: UserDetailViewModel(),
         onEvent: { _ in }
     )
 }

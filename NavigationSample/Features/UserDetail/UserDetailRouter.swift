@@ -26,9 +26,6 @@ final class UserDetailRouter {
     /// 表示モード
     let displayMode: DisplayMode
 
-    /// いいね済かどうか
-    var isLiked: Bool = false
-
     /// Feature 内の push 遷移状態
     var path: [UserDetailPath] = []
 
@@ -69,7 +66,7 @@ final class UserDetailRouter {
         modal = nil
     }
 
-    /// App 層イベントを発火
+    /// 上位へイベントを発火
     func sendEvent(_ event: UserDetailEvent) {
         onEvent?(event)
     }
@@ -79,10 +76,4 @@ final class UserDetailRouter {
         sendEvent(.dismissed)
     }
 
-    /// いいねを送る
-    func sendLike(_ type: LikeType) {
-        modal = nil
-        isLiked = true
-        sendEvent(.liked(userId: user.id, type: type))
-    }
 }

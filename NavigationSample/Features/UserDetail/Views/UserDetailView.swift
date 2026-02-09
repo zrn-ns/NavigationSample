@@ -8,6 +8,7 @@ import SwiftUI
 /// ユーザ詳細画面
 struct UserDetailView: View {
     let router: UserDetailRouter
+    let viewModel: UserDetailViewModel
 
     var body: some View {
         ScrollView {
@@ -92,14 +93,14 @@ struct UserDetailView: View {
                     router.showLikeSend()
                 } label: {
                     Label(
-                        router.isLiked ? "いいね済" : "いいね！",
+                        viewModel.isLiked ? "いいね済" : "いいね！",
                         systemImage: "heart.fill"
                     )
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(router.isLiked ? .gray : .pink)
-                .disabled(router.isLiked)
+                .tint(viewModel.isLiked ? .gray : .pink)
+                .disabled(viewModel.isLiked)
             }
         }
     }
@@ -108,7 +109,8 @@ struct UserDetailView: View {
 #Preview {
     NavigationStack {
         UserDetailView(
-            router: UserDetailRouter(user: User.samples[0])
+            router: UserDetailRouter(user: User.samples[0]),
+            viewModel: UserDetailViewModel()
         )
     }
 }
