@@ -9,7 +9,7 @@ import SwiftUI
 ///
 /// 手段2: NavigationStack は Feature の Root にのみ置く
 ///
-/// router と viewModel を受け取り、子 View にバケツリレーで渡す。
+/// router を Environment で子 View に公開する。
 struct UserDetailRootView: View {
     /// Feature 内ルーティング（path と modal を管理）
     @State private var router: UserDetailRouter
@@ -28,7 +28,7 @@ struct UserDetailRootView: View {
 
     var body: some View {
         NavigationStack(path: $router.path) {
-            UserDetailView(router: router, viewModel: viewModel)
+            UserDetailView(viewModel: viewModel)
                 .navigationDestination(for: UserDetailPath.self) { destination in
                     switch destination {
                     case .photos:
@@ -45,6 +45,7 @@ struct UserDetailRootView: View {
                     }
                 }
         }
+        .environment(router)
         .sheet(item: $router.modal) { modal in
             switch modal {
             case .likeSend:

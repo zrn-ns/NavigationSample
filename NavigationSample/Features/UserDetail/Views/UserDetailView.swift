@@ -7,7 +7,7 @@ import SwiftUI
 
 /// ユーザ詳細画面
 struct UserDetailView: View {
-    let router: UserDetailRouter
+    @Environment(UserDetailRouter.self) private var router
     let viewModel: UserDetailViewModel
 
     var body: some View {
@@ -108,9 +108,7 @@ struct UserDetailView: View {
 
 #Preview {
     NavigationStack {
-        UserDetailView(
-            router: UserDetailRouter(),
-            viewModel: UserDetailViewModel(user: User.samples[0])
-        )
+        UserDetailView(viewModel: UserDetailViewModel(user: User.samples[0]))
     }
+    .environment(UserDetailRouter())
 }

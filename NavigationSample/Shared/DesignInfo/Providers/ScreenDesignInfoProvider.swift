@@ -39,7 +39,7 @@ enum ScreenDesignInfoProvider {
         description: """
         UserDetail Feature の起点画面。NavigationStack の root として機能し、
         Feature 内で push 遷移（写真一覧・写真詳細）と modal 表示（いいね送信画面）を管理する。
-        UserDetailRouter がバケツリレーで状態を管理。
+        UserDetailRouter を Environment で子 View に公開。
 
         DisplayMode による表示パターンの違い:
         ・standard — Home タブからの遷移。左上に「← 戻る」ボタン、「いいね！」ボタンあり。
