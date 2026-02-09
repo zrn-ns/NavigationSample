@@ -13,7 +13,7 @@ import SwiftUI
 @MainActor
 final class UserGridCoordinator {
     private let navigationController: UINavigationController
-    private weak var appCoordinator: AppCoordinator?
+    private weak var mainTabCoordinator: MainTabCoordinator?
 
     /// push 風トランジションのデリゲート（強参照で保持）
     private let transitioningDelegate = PushTransitioningDelegate()
@@ -24,9 +24,9 @@ final class UserGridCoordinator {
     /// ユーザグリッド VC への参照（ブロック時のユーザ削除に使用）
     private weak var gridVC: UserGridViewController?
 
-    init(navigationController: UINavigationController, appCoordinator: AppCoordinator) {
+    init(navigationController: UINavigationController, mainTabCoordinator: MainTabCoordinator) {
         self.navigationController = navigationController
-        self.appCoordinator = appCoordinator
+        self.mainTabCoordinator = mainTabCoordinator
     }
 
     /// 初期画面（グリッド）を表示

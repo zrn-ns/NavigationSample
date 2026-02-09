@@ -1,5 +1,5 @@
 //
-//  AppCoordinator.swift
+//  MainTabCoordinator.swift
 //  NavigationSample
 //
 
@@ -11,7 +11,7 @@ import SwiftUI
 /// 原理8: 文脈を開始した主体が、文脈を終了させる責務を持つ
 /// App 層が開始した文脈（Modal、Tab）は App 層が閉じる
 @MainActor
-final class AppCoordinator {
+final class MainTabCoordinator {
     private let window: UIWindow
     private var tabBarController: MainTabBarController?
 
@@ -19,7 +19,7 @@ final class AppCoordinator {
     private var userGridCoordinator: UserGridCoordinator?
 
     /// App 層の Modal 状態
-    var currentModal: AppModal?
+    var currentModal: MainTabModal?
 
     init(window: UIWindow) {
         self.window = window
@@ -36,7 +36,7 @@ final class AppCoordinator {
     func setupUserGridCoordinator(navigationController: UINavigationController) {
         let coordinator = UserGridCoordinator(
             navigationController: navigationController,
-            appCoordinator: self
+            mainTabCoordinator: self
         )
         self.userGridCoordinator = coordinator
         coordinator.start()

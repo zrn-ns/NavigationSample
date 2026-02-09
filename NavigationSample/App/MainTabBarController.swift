@@ -11,9 +11,9 @@ import SwiftUI
 /// 原則6: 構造的に NavigationStack が複数存在してもよいが、
 /// 同時に有効なものは1つにする
 final class MainTabBarController: UITabBarController {
-    private weak var coordinator: AppCoordinator?
+    private weak var coordinator: MainTabCoordinator?
 
-    init(coordinator: AppCoordinator) {
+    init(coordinator: MainTabCoordinator) {
         self.coordinator = coordinator
         super.init(nibName: nil, bundle: nil)
     }

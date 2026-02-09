@@ -100,7 +100,7 @@ enum PracticeInfoProvider {
             .init(
                 description: "Modal を Identifiable な enum で定義する例",
                 code: """
-                enum AppModal: Identifiable {
+                enum MainTabModal: Identifiable {
                     case profilePreview
                     case web(URL)
 
@@ -134,8 +134,8 @@ enum PracticeInfoProvider {
             .init(
                 description: "item: ベースで Modal を制御する例",
                 code: """
-                .sheet(item: $appModal) {
-                    AppModalRoot(modal: $0)
+                .sheet(item: $mainTabModal) {
+                    MainTabModalRoot(modal: $0)
                 }
                 """
             ),
@@ -330,7 +330,7 @@ enum PracticeInfoProvider {
         UIKit App
         ├── AppDelegate.swift (UIKit)
         ├── SceneDelegate.swift (UIKit)
-        ├── AppCoordinator.swift (UIKit Coordinator)
+        ├── MainTabCoordinator.swift (UIKit Coordinator)
         ├── MainTabBarController.swift (UITabBarController)
         └── Features/
             ├── Home/ (UIHostingController + SwiftUI NavigationStack)
@@ -349,13 +349,13 @@ enum PracticeInfoProvider {
         """,
         codeExamples: [
             .init(
-                description: "AppCoordinator（UIKit）の例",
+                description: "MainTabCoordinator（UIKit）の例",
                 code: """
                 @MainActor
-                final class AppCoordinator {
+                final class MainTabCoordinator {
                     private let window: UIWindow
                     private var tabBarController: MainTabBarController?
-                    var currentModal: AppModal?
+                    var currentModal: MainTabModal?
 
                     func start() {
                         let tabBarController = MainTabBarController(coordinator: self)
@@ -379,7 +379,7 @@ enum PracticeInfoProvider {
                 description: "MainTabBarController（UIKit）の例",
                 code: """
                 final class MainTabBarController: UITabBarController {
-                    private weak var coordinator: AppCoordinator?
+                    private weak var coordinator: MainTabCoordinator?
 
                     private func setupTabs() {
                         let homeRootView = HomeRootView(onEvent: { [weak self] event in

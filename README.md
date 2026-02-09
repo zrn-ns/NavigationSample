@@ -92,8 +92,8 @@ NavigationSample/
 ├── App/
 │   ├── AppDelegate.swift
 │   ├── SceneDelegate.swift
-│   ├── AppCoordinator.swift
-│   ├── AppModal.swift
+│   ├── MainTabCoordinator.swift
+│   ├── MainTabModal.swift
 │   └── MainTabBarController.swift
 │
 ├── Features/

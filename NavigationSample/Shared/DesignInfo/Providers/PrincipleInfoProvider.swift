@@ -264,7 +264,7 @@ enum PrincipleInfoProvider {
         内部に独自の Navigation を持つことができる。
 
         Modal enum は「文脈のスコープ」で定義する:
-        ・App 文脈 → AppModal
+        ・App 文脈 → MainTabModal
         ・Feature 文脈 → FeatureModal
         ・画面単位では定義しない
         """,
