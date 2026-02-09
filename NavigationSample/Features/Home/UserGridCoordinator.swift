@@ -21,6 +21,9 @@ final class UserGridCoordinator {
     /// 現在表示中の詳細画面
     private weak var presentedDetailVC: UIViewController?
 
+    /// ユーザグリッド VC への参照（ブロック時のユーザ削除に使用）
+    private weak var gridVC: UserGridViewController?
+
     init(navigationController: UINavigationController, appCoordinator: AppCoordinator) {
         self.navigationController = navigationController
         self.appCoordinator = appCoordinator
@@ -32,6 +35,7 @@ final class UserGridCoordinator {
             users: User.samples,
             coordinator: self
         )
+        self.gridVC = gridVC
         navigationController.setViewControllers([gridVC], animated: false)
     }
 
@@ -75,6 +79,12 @@ final class UserGridCoordinator {
         case .liked(let userId, let type):
             // いいね処理（ログ出力のみ。詳細画面は閉じない）
             print("いいねを送りました: \(userId)（\(type.displayName) \(type.cost)pt）")
+
+        case .blocked(let userId):
+            // ブロック処理: 詳細画面を閉じてグリッドからユーザを削除
+            presentedDetailVC?.dismiss(animated: true)
+            presentedDetailVC = nil
+            gridVC?.removeUser(id: userId)
         }
     }
 }

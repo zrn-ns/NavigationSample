@@ -29,6 +29,9 @@ struct UserDetailRootView: View {
     var body: some View {
         NavigationStack(path: $router.path) {
             UserDetailView(viewModel: viewModel)
+                .blockUserToolbar(displayMode: viewModel.displayMode) {
+                    viewModel.blockUser()
+                }
                 .navigationDestination(for: UserDetailPath.self) { destination in
                     switch destination {
                     case .photos:
@@ -36,12 +39,18 @@ struct UserDetailRootView: View {
                             photos: viewModel.user.photos,
                             onShowDetail: { photoId in router.showPhotoDetail(photoId: photoId) }
                         )
+                        .blockUserToolbar(displayMode: viewModel.displayMode) {
+                            viewModel.blockUser()
+                        }
 
                     case .photoDetail(let photoId):
                         UserPhotoDetailView(
                             photos: viewModel.user.photos,
                             photoId: photoId
                         )
+                        .blockUserToolbar(displayMode: viewModel.displayMode) {
+                            viewModel.blockUser()
+                        }
                     }
                 }
         }

@@ -16,4 +16,7 @@ enum UserDetailEvent {
 
     /// いいねが送られた
     case liked(userId: User.ID, type: LikeType)
+
+    /// ユーザがブロックされた
+    case blocked(userId: User.ID)
 }

@@ -81,6 +81,9 @@ final class AppCoordinator {
         case .liked:
             // プレビューなのでいいねは無視
             break
+        case .blocked:
+            // プレビューなのでブロックは無視
+            break
         }
     }
 

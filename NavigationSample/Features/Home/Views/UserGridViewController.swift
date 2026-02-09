@@ -9,7 +9,7 @@ import UIKit
 ///
 /// UICollectionView の CompositionalLayout を使用してグリッド表示
 final class UserGridViewController: UIViewController {
-    private let users: [User]
+    private var users: [User]
     private weak var coordinator: UserGridCoordinator?
 
     private lazy var collectionView: UICollectionView = {
@@ -56,6 +56,13 @@ final class UserGridViewController: UIViewController {
             presentingViewController: self
         )
         designInfoButton.addToViewController(self)
+    }
+
+    /// 指定ユーザをグリッドから削除する
+    func removeUser(id: User.ID) {
+        guard let index = users.firstIndex(where: { $0.id == id }) else { return }
+        users.remove(at: index)
+        collectionView.deleteItems(at: [IndexPath(item: index, section: 0)])
     }
 
     private func createLayout() -> UICollectionViewLayout {

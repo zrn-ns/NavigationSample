@@ -49,4 +49,9 @@ final class UserDetailViewModel {
     func dismiss() {
         sendEvent(.dismissed)
     }
+
+    /// ユーザをブロックする（実際のアプリでは API リクエストを行う）
+    func blockUser() {
+        sendEvent(.blocked(userId: user.id))
+    }
 }
