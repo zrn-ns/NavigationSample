@@ -1,2 +1,6 @@
+# Xcode
+xcuserdata/
+build/
+
 # Claude Code
 .claude/settings.local.json
