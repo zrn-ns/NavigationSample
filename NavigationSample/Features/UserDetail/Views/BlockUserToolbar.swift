@@ -30,14 +30,19 @@ private struct BlockUserToolbar: ViewModifier {
                         }
                     }
                 }
-                .confirmationDialog(
-                    "このユーザをブロックしますか？",
-                    isPresented: $showsConfirmation,
-                    titleVisibility: .visible
-                ) {
-                    Button("ブロック", role: .destructive) {
-                        onBlock()
-                    }
+                .overlay {
+                    // confirmationDialog を toolbar 外に配置し、
+                    // 画面下部のアクションシートとして表示する
+                    Color.clear
+                        .confirmationDialog(
+                            "このユーザをブロックしますか？",
+                            isPresented: $showsConfirmation,
+                            titleVisibility: .visible
+                        ) {
+                            Button("ブロック", role: .destructive) {
+                                onBlock()
+                            }
+                        }
                 }
         } else {
             content
