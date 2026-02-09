@@ -35,7 +35,7 @@ UIKit と SwiftUI が混在するプロジェクトにおけるナビゲーシ�
 
 ## 対象環境
 
-- iOS 17.0+
+- iOS 17.6+
 - Xcode 26.2+
 - Swift 6
 
