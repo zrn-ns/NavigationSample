@@ -367,7 +367,7 @@ enum PrincipleInfoProvider {
                 func handle(_ event: SettingsEvent) {
                     switch event {
                     case .showProfilePreview:
-                        appModal = .profilePreview
+                        currentModal = .profilePreview
                     }
                 }
                 """

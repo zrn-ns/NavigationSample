@@ -134,8 +134,14 @@ enum PracticeInfoProvider {
             .init(
                 description: "item: ベースで Modal を制御する例",
                 code: """
-                .sheet(item: $mainTabModal) {
-                    MainTabModalRoot(modal: $0)
+                .sheet(item: $router.modal) { modal in
+                    switch modal {
+                    case .likeSend:
+                        LikeSendRootView(
+                            user: viewModel.user,
+                            onEvent: { event in /* ... */ }
+                        )
+                    }
                 }
                 """
             ),
@@ -201,7 +207,7 @@ enum PracticeInfoProvider {
                 func handle(_ event: SettingsEvent) {
                     switch event {
                     case .showProfilePreview:
-                        appModal = .profilePreview
+                        currentModal = .profilePreview
                     }
                 }
                 """
@@ -368,9 +374,9 @@ enum PracticeInfoProvider {
                     func handle(_ event: SettingsEvent) {
                         switch event {
                         case .showProfilePreview:
-                            presentModal(.profilePreview)
+                            presentProfilePreview()
                         case .openHome:
-                            selectTab(.home)
+                            tabBarController?.selectedIndex = 0
                         }
                     }
                 }
@@ -383,16 +389,29 @@ enum PracticeInfoProvider {
                     private weak var coordinator: MainTabCoordinator?
 
                     private func setupTabs() {
-                        let homeRootView = HomeRootView(onEvent: { [weak self] event in
-                            self?.coordinator?.handle(event)
-                        })
-                        let homeVC = UIHostingController(rootView: homeRootView)
-                        homeVC.tabBarItem = UITabBarItem(
+                        // Home Tab (UIKit ベースのグリッド)
+                        let homeNavController = UINavigationController()
+                        homeNavController.tabBarItem = UITabBarItem(
                             title: "ホーム",
-                            image: UIImage(systemName: "house"),
+                            image: UIImage(systemName: "heart.circle"),
                             tag: 0
                         )
-                        viewControllers = [homeVC, settingsVC]
+                        coordinator?.setupUserGridCoordinator(
+                            navigationController: homeNavController
+                        )
+
+                        // Settings Tab (SwiftUI ベース)
+                        let settingsRootView = SettingsRootView(onEvent: { [weak self] event in
+                            self?.coordinator?.handle(event)
+                        })
+                        let settingsVC = UIHostingController(rootView: settingsRootView)
+                        settingsVC.tabBarItem = UITabBarItem(
+                            title: "設定",
+                            image: UIImage(systemName: "gear"),
+                            tag: 1
+                        )
+
+                        viewControllers = [homeNavController, settingsVC]
                     }
                 }
                 """
