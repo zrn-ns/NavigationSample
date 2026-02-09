@@ -12,7 +12,7 @@ enum PracticeInfoProvider {
     static let all: [PracticeInfo] = [
         practice1, practice2, practice3, practice4, practice5,
         practice6, practice7, practice8, practice9, practice10,
-        practice11,
+        practice11, practice12,
     ]
 
     /// 指定した ID の手段情報を取得
@@ -535,5 +535,59 @@ enum PracticeInfoProvider {
             ),
         ],
         relatedPrinciples: [.f2, .e2]
+    )
+
+    // MARK: - 手段12: Router は Environment で Feature 内に公開する
+
+    static let practice12 = PracticeInfo(
+        id: "practice12",
+        title: "Router は Environment で Feature 内に公開する",
+        description: """
+        Router は Feature 全体で共有する依存であり、\
+        Feature 内の複数の子 View からアクセスされうる。\
+        RootView で .environment(router) を設定し、\
+        子 View では @Environment(Router.self) で取得する。
+
+        Environment は View 階層を跨いで共有する\
+        サービス的な依存の伝搬に適した仕組みである。\
+        Router はまさにこの性質を持つため Environment が適切。
+
+        一方、ViewModel のように特定の View だけが消費する\
+        1対1 の依存は init 引数で直接渡す。\
+        すべてを Environment に載せるのではなく、\
+        依存の共有範囲に応じて使い分ける。
+        """,
+        codeExamples: [
+            .init(
+                description: "RootView で Router を Environment に設定する例",
+                code: """
+                struct UserDetailRootView: View {
+                    @State private var router: UserDetailRouter
+                    @State private var viewModel: UserDetailViewModel
+
+                    var body: some View {
+                        NavigationStack(path: $router.path) {
+                            // ViewModel は init 引数で渡す（1対1 の依存）
+                            UserDetailView(viewModel: viewModel)
+                        }
+                        // Router は Environment で公開（Feature 全体で共有）
+                        .environment(router)
+                    }
+                }
+                """
+            ),
+            .init(
+                description: "子 View で Router を Environment から取得する例",
+                code: """
+                struct UserDetailView: View {
+                    @Environment(UserDetailRouter.self) private var router
+                    let viewModel: UserDetailViewModel
+
+                    // ...
+                }
+                """
+            ),
+        ],
+        relatedPrinciples: [.c2]
     )
 }
