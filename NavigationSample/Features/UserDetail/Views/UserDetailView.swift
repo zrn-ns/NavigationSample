@@ -19,13 +19,13 @@ struct UserDetailView: View {
             }
             .padding()
         }
-        .navigationTitle(router.user.name)
+        .navigationTitle(viewModel.user.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if router.displayMode == .standard {
+            if viewModel.displayMode == .standard {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        router.dismiss()
+                        viewModel.dismiss()
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "chevron.left")
@@ -34,10 +34,10 @@ struct UserDetailView: View {
                     }
                 }
             }
-            if router.displayMode == .me {
+            if viewModel.displayMode == .me {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        router.dismiss()
+                        viewModel.dismiss()
                     } label: {
                         Image(systemName: "xmark")
                     }
@@ -51,13 +51,13 @@ struct UserDetailView: View {
 
     private var profileHeader: some View {
         VStack(spacing: 12) {
-            Image(systemName: router.user.imageURL)
+            Image(systemName: viewModel.user.imageURL)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 120, height: 120)
                 .foregroundStyle(.blue)
 
-            Text("\(router.user.name), \(router.user.age)")
+            Text("\(viewModel.user.name), \(viewModel.user.age)")
                 .font(.title)
                 .fontWeight(.bold)
         }
@@ -68,7 +68,7 @@ struct UserDetailView: View {
             Text("自己紹介")
                 .font(.headline)
 
-            Text(router.user.bio)
+            Text(viewModel.user.bio)
                 .font(.body)
                 .foregroundStyle(.secondary)
         }
@@ -88,7 +88,7 @@ struct UserDetailView: View {
             }
             .buttonStyle(.bordered)
 
-            if router.displayMode == .standard {
+            if viewModel.displayMode == .standard {
                 Button {
                     router.showLikeSend()
                 } label: {
@@ -109,8 +109,8 @@ struct UserDetailView: View {
 #Preview {
     NavigationStack {
         UserDetailView(
-            router: UserDetailRouter(user: User.samples[0]),
-            viewModel: UserDetailViewModel()
+            router: UserDetailRouter(),
+            viewModel: UserDetailViewModel(user: User.samples[0])
         )
     }
 }

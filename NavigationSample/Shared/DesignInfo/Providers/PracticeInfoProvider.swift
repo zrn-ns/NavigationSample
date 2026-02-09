@@ -258,7 +258,8 @@ enum PracticeInfoProvider {
                 code: """
                 // Coordinator が router を生成し、状態を参照する
                 func showUserDetail(user: User) {
-                    let router = UserDetailRouter(user: user)
+                    let router = UserDetailRouter()
+                    let viewModel = UserDetailViewModel(user: user)
 
                     dismissalInteractor.isAtNavigationRoot = { [weak router] in
                         router?.path.isEmpty ?? true
@@ -266,6 +267,7 @@ enum PracticeInfoProvider {
 
                     let detailRootView = UserDetailRootView(
                         router: router,
+                        viewModel: viewModel,
                         onEvent: { [weak self] event in self?.handle(event) }
                     )
                     // ...
@@ -451,7 +453,7 @@ enum PracticeInfoProvider {
                     switch modal {
                     case .legacyProfile:
                         LegacyProfileModalView(
-                            user: router.user,
+                            user: viewModel.user,
                             onDismiss: { router.dismissModal() }
                         )
                     }
@@ -467,8 +469,11 @@ enum PracticeInfoProvider {
                     private let navigationController: UINavigationController
 
                     func showUserDetail(user: User) {
+                        let router = UserDetailRouter()
+                        let viewModel = UserDetailViewModel(user: user)
                         let detailRootView = UserDetailRootView(
-                            user: user,
+                            router: router,
+                            viewModel: viewModel,
                             onEvent: { [weak self] event in
                                 self?.handle(event)
                             }

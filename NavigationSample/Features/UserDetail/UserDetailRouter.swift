@@ -5,41 +5,18 @@
 
 import SwiftUI
 
-/// UserDetail Feature のルーティングを管理
+/// UserDetail Feature の遷移状態を管理
 ///
-/// RootView で生成し、子 View にバケツリレーで渡す。
-/// Environment ではなくバケツリレーにすることで、注入忘れをコンパイル時に検出できる。
+/// push / modal の遷移のみを責務とする。
+/// データ保持・イベント通知は UserDetailViewModel が担当。
 @MainActor
 @Observable
 final class UserDetailRouter {
-    /// 表示モード
-    enum DisplayMode {
-        /// 通常表示（他ユーザの詳細）
-        case standard
-        /// 自分のプロフィール表示
-        case me
-    }
-
-    /// 表示対象のユーザ
-    let user: User
-
-    /// 表示モード
-    let displayMode: DisplayMode
-
     /// Feature 内の push 遷移状態
     var path: [UserDetailPath] = []
 
     /// Feature 内の modal 状態
     var modal: UserDetailModal?
-
-    /// 上位へのイベント通知
-    var onEvent: ((UserDetailEvent) -> Void)?
-
-    init(user: User, displayMode: DisplayMode = .standard, onEvent: ((UserDetailEvent) -> Void)? = nil) {
-        self.user = user
-        self.displayMode = displayMode
-        self.onEvent = onEvent
-    }
 
     /// push 遷移
     func navigate(to destination: UserDetailPath) {
@@ -65,15 +42,4 @@ final class UserDetailRouter {
     func dismissModal() {
         modal = nil
     }
-
-    /// 上位へイベントを発火
-    func sendEvent(_ event: UserDetailEvent) {
-        onEvent?(event)
-    }
-
-    /// 詳細画面を閉じる（戻る）
-    func dismiss() {
-        sendEvent(.dismissed)
-    }
-
 }

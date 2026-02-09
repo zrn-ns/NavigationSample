@@ -9,8 +9,7 @@ import SwiftUI
 ///
 /// 手段2: NavigationStack は Feature の Root にのみ置く
 ///
-/// router を受け取り、子 View にバケツリレーで渡す。
-/// router 1つだけをバケツリレーすることで、引数の増加を抑制。
+/// router と viewModel を受け取り、子 View にバケツリレーで渡す。
 struct UserDetailRootView: View {
     /// Feature 内ルーティング（path と modal を管理）
     @State private var router: UserDetailRouter
@@ -34,13 +33,13 @@ struct UserDetailRootView: View {
                     switch destination {
                     case .photos:
                         UserPhotoListView(
-                            photos: router.user.photos,
+                            photos: viewModel.user.photos,
                             onShowDetail: { photoId in router.showPhotoDetail(photoId: photoId) }
                         )
 
                     case .photoDetail(let photoId):
                         UserPhotoDetailView(
-                            photos: router.user.photos,
+                            photos: viewModel.user.photos,
                             photoId: photoId
                         )
                     }
@@ -50,13 +49,13 @@ struct UserDetailRootView: View {
             switch modal {
             case .likeSend:
                 LikeSendRootView(
-                    user: router.user,
+                    user: viewModel.user,
                     onEvent: { event in
                         switch event {
                         case .liked(let type):
                             router.dismissModal()
                             viewModel.sendLike(type)
-                            router.sendEvent(.liked(userId: router.user.id, type: type))
+                            viewModel.sendEvent(.liked(userId: viewModel.user.id, type: type))
                         case .dismissed:
                             router.dismissModal()
                         }
@@ -65,15 +64,15 @@ struct UserDetailRootView: View {
             }
         }
         .onAppear {
-            router.onEvent = onEvent
+            viewModel.onEvent = onEvent
         }
     }
 }
 
 #Preview {
     UserDetailRootView(
-        router: UserDetailRouter(user: User.samples[0]),
-        viewModel: UserDetailViewModel(),
+        router: UserDetailRouter(),
+        viewModel: UserDetailViewModel(user: User.samples[0]),
         onEvent: { _ in }
     )
 }
