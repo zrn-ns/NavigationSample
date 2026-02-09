@@ -7,11 +7,11 @@ import SwiftUI
 
 /// 写真詳細画面（写真拡大表示）
 struct UserPhotoDetailView: View {
-    let router: UserDetailRouter
+    let photos: [User.Photo]
     let photoId: User.Photo.ID
 
     private var photo: User.Photo? {
-        router.user.photos.first { $0.id == photoId }
+        photos.first { $0.id == photoId }
     }
 
     var body: some View {
@@ -47,7 +47,7 @@ struct UserPhotoDetailView: View {
 #Preview {
     NavigationStack {
         UserPhotoDetailView(
-            router: UserDetailRouter(user: User.samples[0]),
+            photos: User.samples[0].photos,
             photoId: User.samples[0].photos[0].id
         )
     }

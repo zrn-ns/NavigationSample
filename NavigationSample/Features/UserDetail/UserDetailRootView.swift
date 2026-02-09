@@ -33,10 +33,16 @@ struct UserDetailRootView: View {
                 .navigationDestination(for: UserDetailPath.self) { destination in
                     switch destination {
                     case .photos:
-                        UserPhotoListView(router: router)
+                        UserPhotoListView(
+                            photos: router.user.photos,
+                            onShowDetail: { photoId in router.showPhotoDetail(photoId: photoId) }
+                        )
 
                     case .photoDetail(let photoId):
-                        UserPhotoDetailView(router: router, photoId: photoId)
+                        UserPhotoDetailView(
+                            photos: router.user.photos,
+                            photoId: photoId
+                        )
                     }
                 }
         }

@@ -7,7 +7,8 @@ import SwiftUI
 
 /// ユーザの写真一覧画面
 struct UserPhotoListView: View {
-    let router: UserDetailRouter
+    let photos: [User.Photo]
+    let onShowDetail: (User.Photo.ID) -> Void
 
     private let columns = [
         GridItem(.flexible()),
@@ -17,9 +18,9 @@ struct UserPhotoListView: View {
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 12) {
-                ForEach(router.user.photos) { photo in
+                ForEach(photos) { photo in
                     PhotoThumbnail(photo: photo) {
-                        router.showPhotoDetail(photoId: photo.id)
+                        onShowDetail(photo.id)
                     }
                 }
             }
@@ -65,7 +66,8 @@ private struct PhotoThumbnail: View {
 #Preview {
     NavigationStack {
         UserPhotoListView(
-            router: UserDetailRouter(user: User.samples[0])
+            photos: User.samples[0].photos,
+            onShowDetail: { _ in }
         )
     }
 }
