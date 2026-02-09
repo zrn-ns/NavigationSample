@@ -2,7 +2,7 @@
 
 UIKit と SwiftUI が混在するプロジェクトにおけるナビゲーション設計パターンを、マッチングアプリをモチーフとしたサンプル実装で示すリポジトリです。
 
-https://github.com/user-attachments/assets/743b093c-a73d-4000-9a6e-daaad6a18f83
+https://github.com/user-attachments/assets/d256606a-de55-4b8c-911d-4e85884a702f
 
 ## このプロジェクトについて
 
