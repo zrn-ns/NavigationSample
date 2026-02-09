@@ -6,13 +6,31 @@ UIKit と SwiftUI が混在するプロジェクトにおけるナビゲーシ�
 
 ### 背景
 
-多くの iOS プロジェクトでは、UIKit で構築された既存のコードベースに SwiftUI を段階的に導入しています。この移行期において、両フレームワークのナビゲーション機構をどう統合するかは共通の課題です。
+#### 移行期の課題
+
+- UIKit ベースの既存アプリに SwiftUI を段階的に導入する状況
+- アプリの基盤は UIKit であり、これはしばらく変わらない前提
+- 将来的な SwiftUI 置き換えを見据え、UIKit に深く依存しすぎない設計が必要
+- 統合ポイントの中で「画面遷移」が最も設計上の困難を伴う
+
+#### パラダイムの違い
+
+- UIKit: 手続き的（pushViewController, present）
+- SwiftUI: 状態駆動（path.append, modal = .xxx）
+- この食い違いを吸収する設計方針が必要
+
+#### ナビゲーション機構を混在させるリスク
+
+- UINavigationController と NavigationStack の混同 → ナビゲーションバー二重化
+- cross-framework push（SwiftUI NavigationStack 内に UIKit 画面を push 等）→ 予期しない動作
+- → Feature 単位で境界を設計し、Feature 間遷移を Modal で行うアプローチ
 
 ### このサンプルが提示するもの
 
 - UIKit / SwiftUI 間のナビゲーション連携パターン（A〜D）の具体的な実装例
 - Feature 単位でナビゲーション状態を管理する Router パターン
 - App 層（UIKit）と Feature 層（SwiftUI）の責務分離
+- Feature 境界によるフレームワーク混在リスクの回避方法
 - 設計原則に基づいた意思決定の根拠（アプリ内の設計情報タブで閲覧可能）
 
 ## 対象環境
@@ -54,7 +72,7 @@ UIKit の LikeSendViewController を UIViewControllerRepresentable でラップ�
 
 ## 設計原則
 
-6 カテゴリ・14 原則でナビゲーション設計の指針を定めています。
+上記の課題に対して、6 カテゴリ・14 原則でナビゲーション設計の指針を定めています。
 
 | カテゴリ | 原則 |
 |---------|------|
