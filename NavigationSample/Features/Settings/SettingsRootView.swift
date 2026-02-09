@@ -15,7 +15,7 @@ struct SettingsRootView: View {
     /// Feature 内ルーティング
     @State private var router = SettingsRouter()
 
-    /// App層へのイベント通知
+    /// 上位へのイベント通知
     let onEvent: (SettingsEvent) -> Void
 
     var body: some View {

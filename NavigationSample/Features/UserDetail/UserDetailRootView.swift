@@ -15,7 +15,7 @@ struct UserDetailRootView: View {
     /// Feature 内ルーティング（path と modal を管理）
     @State private var router: UserDetailRouter
 
-    /// App層へのイベント通知
+    /// 上位へのイベント通知
     let onEvent: (UserDetailEvent) -> Void
 
     init(router: UserDetailRouter, onEvent: @escaping (UserDetailEvent) -> Void) {
