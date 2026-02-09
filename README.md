@@ -2,6 +2,8 @@
 
 UIKit と SwiftUI が混在するプロジェクトにおけるナビゲーション設計パターンを、マッチングアプリをモチーフとしたサンプル実装で示すリポジトリです。
 
+[設計情報ドキュメント](https://zrn-ns.github.io/NavigationSample/)
+
 https://github.com/user-attachments/assets/d256606a-de55-4b8c-911d-4e85884a702f
 
 ## このプロジェクトについて
@@ -85,7 +87,7 @@ UIKit の LikeSendViewController を UIViewControllerRepresentable でラップ�
 | **責務分離** | R1: View 無決定権原則 / R2: 開始者終了原則 |
 | **結果伝達** | E1: 終了結果原則 / E2: Event 委譲原則 |
 
-各原則の詳細な説明と具体手段は、アプリ内の設計情報タブで確認できます。
+各原則の詳細な説明と具体手段は、アプリ内の設計情報タブまたは [設計情報ドキュメント](https://zrn-ns.github.io/NavigationSample/) で確認できます。
 
 ## ディレクトリ構造
 
