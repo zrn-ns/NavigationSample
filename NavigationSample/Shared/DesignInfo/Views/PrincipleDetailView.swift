@@ -112,7 +112,7 @@ struct PrincipleDetailView: View {
             ForEach(principleInfo.relatedPractices) { practice in
                 NavigationLink(value: practice) {
                     HStack {
-                        Text(practice.title)
+                        Text("\(practice.displayId): \(practice.title)")
                             .font(.subheadline)
                             .multilineTextAlignment(.leading)
                         Spacer()

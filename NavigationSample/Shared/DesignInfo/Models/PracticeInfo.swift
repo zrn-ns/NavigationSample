@@ -13,6 +13,11 @@ struct PracticeInfo: Hashable, Identifiable {
     let codeExamples: [CodeExample]
     let relatedPrinciples: [ScreenDesignInfo.Principle]
 
+    var displayId: String {
+        let number = id.replacingOccurrences(of: "practice", with: "")
+        return "手段\(number)"
+    }
+
     struct CodeExample: Hashable {
         let description: String
         let code: String

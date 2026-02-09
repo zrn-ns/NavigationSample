@@ -23,14 +23,14 @@ struct PracticeDetailView: View {
             }
             .padding()
         }
-        .navigationTitle(practiceInfo.title)
+        .navigationTitle(practiceInfo.displayId)
         .navigationBarTitleDisplayMode(.inline)
     }
 
     // MARK: - Sections
 
     private var headerSection: some View {
-        Text(practiceInfo.title)
+        Text("\(practiceInfo.displayId): \(practiceInfo.title)")
             .font(.title3)
             .fontWeight(.bold)
     }

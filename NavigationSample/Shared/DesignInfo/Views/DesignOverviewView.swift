@@ -79,7 +79,7 @@ struct DesignOverviewView: View {
             ForEach(PracticeInfoProvider.all) { practice in
                 NavigationLink(value: practice) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(practice.title)
+                        Text("\(practice.displayId): \(practice.title)")
                             .font(.subheadline)
                             .fontWeight(.medium)
                         Text(principlesCodes(for: practice))
