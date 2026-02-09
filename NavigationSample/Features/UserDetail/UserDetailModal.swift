@@ -12,10 +12,5 @@ enum UserDetailModal: Identifiable {
     /// いいね送信画面（UIKit）
     case likeSend
 
-    var id: String {
-        switch self {
-        case .likeSend:
-            return "likeSend"
-        }
-    }
+    var id: Self { self }
 }
