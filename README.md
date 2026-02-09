@@ -91,7 +91,9 @@ UIKit の LikeSendViewController を UIViewControllerRepresentable でラップ�
 NavigationSample/
 ├── App/
 │   ├── AppDelegate.swift
-│   ├── SceneDelegate.swift
+│   └── SceneDelegate.swift
+│
+├── MainTab/
 │   ├── MainTabCoordinator.swift
 │   ├── MainTabModal.swift
 │   └── MainTabBarController.swift

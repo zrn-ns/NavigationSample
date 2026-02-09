@@ -330,8 +330,9 @@ enum PracticeInfoProvider {
         UIKit App
         ├── AppDelegate.swift (UIKit)
         ├── SceneDelegate.swift (UIKit)
-        ├── MainTabCoordinator.swift (UIKit Coordinator)
-        ├── MainTabBarController.swift (UITabBarController)
+        ├── MainTab/
+        │   ├── MainTabCoordinator.swift (UIKit Coordinator)
+        │   └── MainTabBarController.swift (UITabBarController)
         └── Features/
             ├── Home/ (UIHostingController + SwiftUI NavigationStack)
             └── Settings/ (UIHostingController + SwiftUI NavigationStack)
