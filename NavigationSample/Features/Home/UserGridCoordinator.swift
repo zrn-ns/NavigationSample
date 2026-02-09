@@ -82,9 +82,10 @@ final class UserGridCoordinator {
 
         case .blocked(let userId):
             // ブロック処理: 詳細画面を閉じてグリッドからユーザを削除
-            presentedDetailVC?.dismiss(animated: true)
+            presentedDetailVC?.dismiss(animated: true) { [weak self] in
+                self?.gridVC?.removeUser(id: userId)
+            }
             presentedDetailVC = nil
-            gridVC?.removeUser(id: userId)
         }
     }
 }
