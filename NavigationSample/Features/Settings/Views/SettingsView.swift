@@ -9,14 +9,14 @@ import SwiftUI
 ///
 /// 原則9: Viewは遷移の決定権を持たない
 struct SettingsView: View {
-    /// Feature 内ルーティング（バケツリレー）
-    let router: SettingsRouter
+    /// 上位へのイベント通知
+    let onEvent: (SettingsEvent) -> Void
 
     var body: some View {
         List {
             Section {
                 Button {
-                    router.sendEvent(.showProfilePreview)
+                    onEvent(.showProfilePreview)
                 } label: {
                     HStack {
                         Text("プロフィールプレビュー")
@@ -32,7 +32,7 @@ struct SettingsView: View {
 
             Section {
                 Button {
-                    router.sendEvent(.openHome)
+                    onEvent(.openHome)
                 } label: {
                     Label("マッチするにはいいねしよう！", systemImage: "heart.fill")
                 }
@@ -45,6 +45,6 @@ struct SettingsView: View {
 
 #Preview {
     NavigationStack {
-        SettingsView(router: SettingsRouter())
+        SettingsView(onEvent: { _ in })
     }
 }
