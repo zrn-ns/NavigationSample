@@ -4,3 +4,6 @@ build/
 
 # Claude Code
 .claude/settings.local.json
+
+# 生成ドキュメント
+docs/
