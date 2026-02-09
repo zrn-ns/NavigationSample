@@ -2,6 +2,9 @@
 xcuserdata/
 build/
 
+# Swift Package Manager
+.build/
+
 # Claude Code
 .claude/settings.local.json
 
