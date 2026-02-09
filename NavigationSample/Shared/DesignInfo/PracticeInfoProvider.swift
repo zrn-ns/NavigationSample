@@ -101,14 +101,12 @@ enum PracticeInfoProvider {
                 description: "Modal 用の Route を Identifiable な enum で定義する例",
                 code: """
                 enum AppModal: Identifiable {
-                    case login
-                    case onboarding
+                    case profilePreview
                     case web(URL)
 
                     var id: String {
                         switch self {
-                        case .login: return "login"
-                        case .onboarding: return "onboarding"
+                        case .profilePreview: return "profilePreview"
                         case .web(let url): return "web-\\(url.absoluteString)"
                         }
                     }
@@ -163,12 +161,12 @@ enum PracticeInfoProvider {
             .init(
                 description: "Modal 用の Feature RootView の例",
                 code: """
-                struct LoginRootView: View {
-                    @State private var path: [LoginRoute] = []
+                struct OnboardingRootView: View {
+                    @State private var path: [OnboardingRoute] = []
 
                     var body: some View {
                         NavigationStack(path: $path) {
-                            LoginStartView()
+                            OnboardingStartView()
                         }
                     }
                 }
@@ -196,14 +194,14 @@ enum PracticeInfoProvider {
             .init(
                 description: "Event を上位に委譲する例",
                 code: """
-                enum HomeEvent {
-                    case requireLogin
+                enum SettingsEvent {
+                    case showProfilePreview
                 }
 
-                func handle(_ event: HomeEvent) {
+                func handle(_ event: SettingsEvent) {
                     switch event {
-                    case .requireLogin:
-                        appModal = .login
+                    case .showProfilePreview:
+                        appModal = .profilePreview
                     }
                 }
                 """
@@ -334,8 +332,7 @@ enum PracticeInfoProvider {
         ├── MainTabBarController.swift (UITabBarController)
         └── Features/
             ├── Home/ (UIHostingController + SwiftUI NavigationStack)
-            ├── Settings/ (UIHostingController + SwiftUI NavigationStack)
-            └── Login/ (UIHostingController + SwiftUI NavigationStack)
+            └── Settings/ (UIHostingController + SwiftUI NavigationStack)
 
         UIKit Coordinator が App 層の Modal 表示・非表示を管理し、\
         Feature 層は Event を上位に委譲するのみ。\
@@ -365,10 +362,12 @@ enum PracticeInfoProvider {
                         window.makeKeyAndVisible()
                     }
 
-                    func handle(_ event: LoginEvent) {
+                    func handle(_ event: SettingsEvent) {
                         switch event {
-                        case .completed, .cancelled:
-                            dismissModal()
+                        case .showProfilePreview:
+                            presentModal(.profilePreview)
+                        case .openHome:
+                            selectTab(.home)
                         }
                     }
                 }
@@ -488,8 +487,8 @@ enum PracticeInfoProvider {
                 code: """
                 final class SomeViewController: UIViewController {
                     private func presentSwiftUIFeature() {
-                        let swiftUIView = LoginRootView(onEvent: { [weak self] event in
-                            self?.handleLoginEvent(event)
+                        let swiftUIView = SettingsRootView(onEvent: { [weak self] event in
+                            self?.handleSettingsEvent(event)
                         })
                         let hostingController = UIHostingController(rootView: swiftUIView)
                         hostingController.modalPresentationStyle = .fullScreen

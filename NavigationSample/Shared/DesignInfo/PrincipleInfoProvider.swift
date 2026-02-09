@@ -70,7 +70,7 @@ enum PrincipleInfoProvider {
                 code: """
                 // 状態を変更するだけで画面が変わる
                 path.append(.detail(id))  // push
-                modal = .login            // modal 表示
+                modal = .likeSend         // modal 表示
                 """
             ),
         ]
@@ -360,14 +360,14 @@ enum PrincipleInfoProvider {
             .init(
                 description: "Event を上位に委譲して Feature 間を連携する例",
                 code: """
-                enum HomeEvent {
-                    case requireLogin
+                enum SettingsEvent {
+                    case showProfilePreview
                 }
 
-                func handle(_ event: HomeEvent) {
+                func handle(_ event: SettingsEvent) {
                     switch event {
-                    case .requireLogin:
-                        appModal = .login
+                    case .showProfilePreview:
+                        appModal = .profilePreview
                     }
                 }
                 """
