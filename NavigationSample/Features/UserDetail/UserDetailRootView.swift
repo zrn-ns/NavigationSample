@@ -26,8 +26,8 @@ struct UserDetailRootView: View {
     var body: some View {
         NavigationStack(path: $router.path) {
             UserDetailView(router: router)
-                .navigationDestination(for: UserDetailRoute.self) { route in
-                    switch route {
+                .navigationDestination(for: UserDetailPath.self) { destination in
+                    switch destination {
                     case .photos:
                         UserPhotoListView(router: router)
 

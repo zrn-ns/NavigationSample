@@ -20,28 +20,28 @@ enum PracticeInfoProvider {
         all.first { $0.id == id }
     }
 
-    // MARK: - 手段1: Feature 単位で Route を定義する
+    // MARK: - 手段1: Feature 単位で Path を定義する
 
     static let practice1 = PracticeInfo(
         id: "practice1",
-        title: "Feature 単位で Route を定義する",
+        title: "Feature 単位で Path を定義する",
         description: """
-        Route は Feature の境界内で定義する。\
-        Feature ごとに専用の Route enum を持つことで、\
+        Path は Feature の境界内で定義する。\
+        Feature ごとに専用の Path enum を持つことで、\
         Feature 間の結合度を下げ、独立した開発・テストを可能にする。
 
-        グローバルな Route は最小限にとどめ、\
+        グローバルな Path は最小限にとどめ、\
         各 Feature が自身の遷移先を型安全に管理する。
         """,
         codeExamples: [
             .init(
-                description: "Feature 単位で Route を定義する例",
+                description: "Feature 単位で Path を定義する例",
                 code: """
-                enum HomeRoute: Hashable {
+                enum HomePath: Hashable {
                     case itemDetail(Item.ID)
                 }
 
-                enum SettingsRoute: Hashable {
+                enum SettingsPath: Hashable {
                     case detail(String)
                 }
                 """
@@ -69,7 +69,7 @@ enum PracticeInfoProvider {
                 description: "Feature の RootView に NavigationStack を配置する例",
                 code: """
                 struct HomeRootView: View {
-                    @State private var path: [HomeRoute] = []
+                    @State private var path: [HomePath] = []
 
                     var body: some View {
                         NavigationStack(path: $path) {
@@ -83,22 +83,22 @@ enum PracticeInfoProvider {
         relatedPrinciples: [.c1, .f1]
     )
 
-    // MARK: - 手段3: Modal 用 Route を別 enum として定義する
+    // MARK: - 手段3: Modal は Path とは別の enum として定義する
 
     static let practice3 = PracticeInfo(
         id: "practice3",
-        title: "Modal 用 Route を別 enum として定義する",
+        title: "Modal は Path とは別の enum として定義する",
         description: """
-        push 用の Route と Modal 用の Route は別の enum として定義する。
+        push 用の Path と Modal は別の enum として定義する。
 
-        push はスタック型（[Route]）、Modal は排他的（Route?）であり、\
+        push はスタック型（[Path]）、Modal は排他的（Modal?）であり、\
         性質が異なるため同一の enum に混在させてはならない。\
         Modal 用の enum は Identifiable に準拠させ、\
         item: ベースの sheet/fullScreenCover で使用する。
         """,
         codeExamples: [
             .init(
-                description: "Modal 用の Route を Identifiable な enum で定義する例",
+                description: "Modal を Identifiable な enum で定義する例",
                 code: """
                 enum AppModal: Identifiable {
                     case profilePreview
@@ -126,7 +126,7 @@ enum PracticeInfoProvider {
         Modal の表示制御には isPresented: ではなく item: を使う。
 
         item: ベースでは「何が表示されているか」を\
-        Route enum で明示的に表現でき、意味表現原則に合致する。\
+        Path / Modal enum で明示的に表現でき、意味表現原則に合致する。\
         isPresented: + Bool では「表示中かどうか」しか表せず、\
         複数の Modal を管理する際に状態が複雑になる。
         """,
@@ -162,7 +162,7 @@ enum PracticeInfoProvider {
                 description: "Modal 用の Feature RootView の例",
                 code: """
                 struct OnboardingRootView: View {
-                    @State private var path: [OnboardingRoute] = []
+                    @State private var path: [OnboardingPath] = []
 
                     var body: some View {
                         NavigationStack(path: $path) {
@@ -220,7 +220,7 @@ enum PracticeInfoProvider {
         命令的な画面遷移メソッドの呼び出しは行わない。
 
         遷移の意味と対応するコード:
-        ・Feature 内 push → path.append(route) — RootView で実行
+        ・Feature 内 push → path.append(destination) — RootView で実行
         ・Feature 内 pop → path.removeLast() — RootView で実行
         ・Feature 内 modal → modal = .xxx — RootView で実行
         ・modal dismiss → modal = nil — RootView で実行
@@ -228,7 +228,7 @@ enum PracticeInfoProvider {
         ・App modal（SwiftUI） → appModal = .xxx — App 層で実行
         ・App modal（UIKit） → present(hostingController, animated:) — Coordinator で実行
         ・modal dismiss（UIKit） → dismiss(animated:) — Coordinator で実行
-        ・上位 push → appPath.append(route) — App 層で実行
+        ・上位 push → appPath.append(destination) — App 層で実行
         ・文脈終了の意図表明 → dismiss() — View で実行
         """,
         codeExamples: [],
@@ -276,21 +276,21 @@ enum PracticeInfoProvider {
         relatedPrinciples: [.r2]
     )
 
-    // MARK: - 手段9: push 用 path は型安全な [Route] を使用する
+    // MARK: - 手段9: push 用 path は型安全な [Path] を使用する
 
     static let practice9 = PracticeInfo(
         id: "practice9",
-        title: "push 用 path は型安全な [Route] を使用する",
+        title: "push 用 path は型安全な [Path] を使用する",
         description: """
-        push 用の path は原則として [Route] を使用する。\
+        push 用の path は原則として [Path] を使用する。\
         NavigationPath は例外的なケースのみ検討する。
 
-        [Route] と NavigationPath の比較:
-        ・型安全性 — [Route] はコンパイル時チェック、NavigationPath はランタイムのみ
-        ・Feature 境界の強制 — [Route] は型エラーで防止、NavigationPath は防止不可
-        ・状態復元 — [Route] は Codable で直接対応、NavigationPath は CodableRepresentation 経由
-        ・網羅性チェック — [Route] は switch で強制、NavigationPath は不可
-        ・複数型の混在 — [Route] は単一型に限定、NavigationPath は可能
+        [Path] と NavigationPath の比較:
+        ・型安全性 — [Path] はコンパイル時チェック、NavigationPath はランタイムのみ
+        ・Feature 境界の強制 — [Path] は型エラーで防止、NavigationPath は防止不可
+        ・状態復元 — [Path] は Codable で直接対応、NavigationPath は CodableRepresentation 経由
+        ・網羅性チェック — [Path] は switch で強制、NavigationPath は不可
+        ・複数型の混在 — [Path] は単一型に限定、NavigationPath は可能
 
         NavigationPath を検討するケース（例外的）:
         ・App 層での統合ナビゲーション（オンボーディングフロー等）
@@ -299,10 +299,10 @@ enum PracticeInfoProvider {
         """,
         codeExamples: [
             .init(
-                description: "推奨: 型安全な [Route]",
+                description: "推奨: 型安全な [Path]",
                 code: """
-                // ✅ 推奨: 型安全な [Route]
-                @State private var path: [HomeRoute] = []
+                // ✅ 推奨: 型安全な [Path]
+                @State private var path: [HomePath] = []
                 """
             ),
             .init(

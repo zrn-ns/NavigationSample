@@ -30,12 +30,12 @@ final class UserDetailRouter {
     var isLiked: Bool = false
 
     /// Feature 内の push 遷移状態
-    var path: [UserDetailRoute] = []
+    var path: [UserDetailPath] = []
 
     /// Feature 内の modal 状態
     var modal: UserDetailModal?
 
-    /// App 層へのイベント通知
+    /// 上位へのイベント通知
     var onEvent: ((UserDetailEvent) -> Void)?
 
     init(user: User, displayMode: DisplayMode = .standard, onEvent: ((UserDetailEvent) -> Void)? = nil) {
@@ -45,8 +45,8 @@ final class UserDetailRouter {
     }
 
     /// push 遷移
-    func navigate(to route: UserDetailRoute) {
-        path.append(route)
+    func navigate(to destination: UserDetailPath) {
+        path.append(destination)
     }
 
     /// 写真一覧を表示

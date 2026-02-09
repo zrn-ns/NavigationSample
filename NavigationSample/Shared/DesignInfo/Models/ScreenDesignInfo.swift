@@ -52,7 +52,7 @@ struct ScreenDesignInfo: Identifiable {
         // Feature 境界
         case f1 = "F1: Push限定原則"
         case f2 = "F2: 切断遷移原則"
-        case f3 = "F3: Route境界原則"
+        case f3 = "F3: Path境界原則"
         // 状態分離
         case p1 = "P1: Push/Modal分離原則"
         case p2 = "P2: Modalスコープ原則"

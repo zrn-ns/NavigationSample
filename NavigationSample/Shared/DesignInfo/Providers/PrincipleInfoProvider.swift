@@ -79,18 +79,18 @@ enum PrincipleInfoProvider {
     static let s2 = PrincipleInfo(
         principle: .s2,
         category: "状態駆動",
-        explanation: "Route は「画面」ではなく「意味」を表す",
+        explanation: "Path は「画面」ではなく「意味」を表す",
         detailedExplanation: """
         状態は「何が起きているか」を直接表現すべきである。\
         Bool は「起きている／いない」しか表せないが、\
-        Route は「何が起きているか」を明確に表せる。
+        Path は「何が起きているか」を明確に表せる。
 
-        Route の命名は画面名ではなくドメイン上の意味を反映させる。\
-        これにより、Route を見ただけで「何のために遷移したか」が分かるようになる。
+        Path の命名は画面名ではなくドメイン上の意味を反映させる。\
+        これにより、Path を見ただけで「何のために遷移したか」が分かるようになる。
         """,
         codeExamples: [
             .init(
-                description: "Route は画面名ではなく意味を表す",
+                description: "Path は画面名ではなく意味を表す",
                 code: """
                 // ❌ 画面名
                 case detailView
@@ -202,25 +202,25 @@ enum PrincipleInfoProvider {
     static let f3 = PrincipleInfo(
         principle: .f3,
         category: "Feature境界",
-        explanation: "Route は Feature 境界を越えない",
+        explanation: "Path は Feature 境界を越えない",
         detailedExplanation: """
-        Feature ごとに Route を定義し、\
-        グローバル Route は最小限にとどめる。
+        Feature ごとに Path を定義し、\
+        グローバル Path は最小限にとどめる。
 
-        Route が Feature 境界を越えると、\
+        Path が Feature 境界を越えると、\
         Feature 間の結合度が高くなり、\
         独立した開発やテストが困難になる。
         """,
         codeExamples: [
             .init(
-                description: "Feature 単位で Route を定義する例",
+                description: "Feature 単位で Path を定義する例",
                 code: """
-                // Feature 単位で Route を定義
-                enum HomeRoute: Hashable {
+                // Feature 単位で Path を定義
+                enum HomePath: Hashable {
                     case itemDetail(Item.ID)
                 }
 
-                enum SettingsRoute: Hashable {
+                enum SettingsPath: Hashable {
                     case detail(String)
                 }
                 """
@@ -235,7 +235,7 @@ enum PrincipleInfoProvider {
         category: "状態分離",
         explanation: "Push 用の状態と Modal 用の状態は分離する",
         detailedExplanation: """
-        push はスタック型（[Route]）、Modal は排他的（Route?）であり、\
+        push はスタック型（[Path]）、Modal は排他的（Modal?）であり、\
         同一 state に混在させてはならない。
 
         これらを分離することで、push と Modal の\
@@ -247,7 +247,7 @@ enum PrincipleInfoProvider {
                 description: "Router で push と modal の状態を分離する例",
                 code: """
                 @Observable final class FeatureRouter {
-                    var path: [FeatureRoute] = []   // push 用
+                    var path: [FeaturePath] = []   // push 用
                     var modal: FeatureModal?         // modal 用
                 }
                 """
@@ -263,7 +263,7 @@ enum PrincipleInfoProvider {
         Modal は dismiss により文脈復帰が起きる独立した文脈である。\
         内部に独自の Navigation を持つことができる。
 
-        ModalRoute は「文脈のスコープ」で定義する:
+        Modal enum は「文脈のスコープ」で定義する:
         ・App 文脈 → AppModal
         ・Feature 文脈 → FeatureModal
         ・画面単位では定義しない
@@ -317,7 +317,7 @@ enum PrincipleInfoProvider {
             .init(
                 description: "Modal を開いた状態を nil に戻して閉じる",
                 code: """
-                // Modal を開いた state（ModalRoute?）を nil に戻す
+                // Modal を開いた state（Modal?）を nil に戻す
                 func dismissModal() {
                     modal = nil
                 }
