@@ -29,12 +29,12 @@ jobs:
         run: swift build --package-path Tools/DocGenerator
 
       - name: Generate docs
-        run: swift run --package-path Tools/DocGenerator
+        run: swift run --package-path Tools/DocGenerator DocGenerator -- --output-dir "$RUNNER_TEMP/docs"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/
+          path: ${{ runner.temp }}/docs/
 
       - name: Deploy to GitHub Pages
         id: deployment

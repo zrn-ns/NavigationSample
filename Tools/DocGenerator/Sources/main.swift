@@ -428,18 +428,18 @@ func buildHTML() -> String {
 let html = buildHTML()
 
 // 出力先ディレクトリの決定
-// Tools/DocGenerator/ から実行されることを想定し、プロジェクトルートの docs/ に出力
-let packageDir = URL(fileURLWithPath: #filePath)
-    .deletingLastPathComponent()  // Sources/
-    .deletingLastPathComponent()  // DocGenerator/
-let projectRoot = packageDir
-    .deletingLastPathComponent()  // Tools/
-    .deletingLastPathComponent()  // プロジェクトルート
-let docsDir = projectRoot.appendingPathComponent("docs")
-let outputFile = docsDir.appendingPathComponent("index.html")
+// --output-dir 引数で指定可能。未指定時はテンポラリディレクトリに出力
+let outputDir: URL
+if let idx = CommandLine.arguments.firstIndex(of: "--output-dir"),
+   idx + 1 < CommandLine.arguments.count {
+    outputDir = URL(fileURLWithPath: CommandLine.arguments[idx + 1])
+} else {
+    outputDir = FileManager.default.temporaryDirectory
+        .appendingPathComponent("DocGenerator")
+}
+let outputFile = outputDir.appendingPathComponent("index.html")
 
-// docs/ ディレクトリを作成
-try FileManager.default.createDirectory(at: docsDir, withIntermediateDirectories: true)
+try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
 
 // HTML を書き出し
 try html.write(to: outputFile, atomically: true, encoding: .utf8)
