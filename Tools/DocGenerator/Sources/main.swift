@@ -196,7 +196,7 @@ func buildSidebar() -> String {
     // 具体的手段
     html += "<li><a href=\"#practices\">具体的手段</a><ul>\n"
     for p in PracticeInfoProvider.all {
-        html += "<li><a href=\"#\(anchorId(for: p))\">\(p.displayId.htmlEscaped)</a></li>\n"
+        html += "<li><a href=\"#\(anchorId(for: p))\">\(p.displayId.htmlEscaped): \(p.title.htmlEscaped)</a></li>\n"
     }
     html += "</ul></li>\n"
 
