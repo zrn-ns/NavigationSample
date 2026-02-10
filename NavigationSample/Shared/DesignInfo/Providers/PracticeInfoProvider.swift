@@ -234,7 +234,6 @@ enum PracticeInfoProvider {
         ・App modal（SwiftUI） → appModal = .xxx — App 層で実行
         ・App modal（UIKit） → present(hostingController, animated:) — Coordinator で実行
         ・modal dismiss（UIKit） → dismiss(animated:) — Coordinator で実行
-        ・上位 push → appPath.append(destination) — App 層で実行
         ・文脈終了の意図表明 → dismiss() — View で実行
         """,
         codeExamples: [],

@@ -200,10 +200,13 @@ enum PrincipleInfoProvider {
         Feature を跨ぐ遷移の手段は以下に限定される:
         ・Tab 切り替え
         ・Modal 表示
-        ・上位 NavigationStack での例外的 push
 
         これらはいずれも「現在の文脈を一時停止し、\
         新しい文脈を開始する」という意味を持つ。
+        push は文脈の継続を意味するため、\
+        Feature 境界を跨ぐ push は一律に禁止する。\
+        push 風の UX が必要な場合は fullScreenModal + \
+        カスタムトランジションで実現する（手段8）。
         """,
         codeExamples: []
     )
