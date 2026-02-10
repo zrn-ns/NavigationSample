@@ -12,7 +12,7 @@ enum PracticeInfoProvider {
     static let all: [PracticeInfo] = [
         practice1, practice2, practice3, practice4, practice5,
         practice6, practice7, practice8, practice9, practice10,
-        practice11, practice12,
+        practice11, practice12, practice13,
     ]
 
     /// 指定した ID の手段情報を取得
@@ -608,5 +608,76 @@ enum PracticeInfoProvider {
             ),
         ],
         relatedPrinciples: [.c2]
+    )
+
+    // MARK: - 手段13: 再利用可能な View はコンポーネント化して Feature から切り離す
+
+    static let practice13 = PracticeInfo(
+        id: "practice13",
+        title: "再利用可能な View はコンポーネント化して Feature から切り離す",
+        description: """
+        View は Feature 固有 View と再利用可能 View に分類できる。
+
+        Feature 固有 View は特定の Feature でのみ使用されるため、\
+        Features/XXX/Views/ に配置し、@Environment で Router を直接参照してよい。\
+        一方、再利用可能 View は複数の Feature で使用される可能性があるため、\
+        特定の Router 型に依存してはならない。\
+        Feature に依存しない View は Shared/Components/ 等の\
+        Feature 外ディレクトリに配置する。
+
+        判断基準: その View が特定の Router 型に依存することで、\
+        不自然な依存（使わない Feature の Router を import する等）が生まれるなら、\
+        その View は再利用可能 View としてコールバックで委譲すべきである。
+
+        再利用可能 View はコールバック（クロージャ）で「意図」を上位に伝え、\
+        RootView の navigationDestination 内で\
+        コールバックと Router を接続する。
+
+        ディレクトリ構成例:
+        Features/UserProfile/Views/  … Feature 固有 View（Router 参照可）
+        Shared/Components/           … 再利用可能 View（コールバック委譲）
+        Shared/Models/               … 共有モデル
+        """,
+        codeExamples: [
+            .init(
+                description: "再利用可能 View: コールバックで意図を委譲する",
+                code: """
+                struct UserPhotoListView: View {
+                    let photos: [Photo]
+                    var onSelectPhoto: (Photo.ID) -> Void
+
+                    var body: some View {
+                        List(photos) { photo in
+                            Button {
+                                onSelectPhoto(photo.id)
+                            } label: {
+                                PhotoRow(photo: photo)
+                            }
+                        }
+                    }
+                }
+                """
+            ),
+            .init(
+                description: "RootView でコールバックと Router を接続する",
+                code: """
+                .navigationDestination(for: UserDetailPath.self) { path in
+                    switch path {
+                    case .photoList(let userId):
+                        UserPhotoListView(
+                            photos: viewModel.photos,
+                            onSelectPhoto: { photoId in
+                                // コールバックを受けて Router で遷移
+                                router.path.append(.photoDetail(photoId))
+                            }
+                        )
+                    case .photoDetail(let photoId):
+                        UserPhotoDetailView(photoId: photoId)
+                    }
+                }
+                """
+            ),
+        ],
+        relatedPrinciples: [.r1]
     )
 }

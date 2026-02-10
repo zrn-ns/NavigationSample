@@ -259,6 +259,12 @@ enum PrincipleInfoProvider {
         View が直接 NavigationLink の遷移先を決定したり、\
         Modal を表示したりするのではなく、\
         Router 等の上位レイヤーに「こうしたい」という意図を伝える。
+
+        View が Router を @Environment で参照してよいのは、\
+        その View が特定の Feature に固有であり、\
+        他の Feature で再利用されない場合に限る。\
+        Feature に依存しない View は Feature 外の共有ディレクトリに配置し、\
+        Router に依存せずコールバックで意図を上位に委譲する。
         """,
         codeExamples: [
             .init(
@@ -269,6 +275,22 @@ enum PrincipleInfoProvider {
                     router.showDetail(id)  // 「詳細を見たい」という意図
                 }
                 // Router が遷移方法を決定
+                """
+            ),
+            .init(
+                description: "Feature 固有 View と再利用可能 View の対比",
+                code: """
+                // Feature 固有 View: Router を直接参照してよい
+                struct UserDetailView: View {
+                    @Environment(UserDetailRouter.self) private var router
+                    // この View は UserDetail Feature 専用
+                }
+
+                // 再利用可能 View: コールバックで意図を委譲する
+                struct UserPhotoListView: View {
+                    var onSelectPhoto: (Photo.ID) -> Void
+                    // Router に依存しないため、他の Feature でも使える
+                }
                 """
             ),
         ]
