@@ -47,7 +47,7 @@ enum PracticeInfoProvider {
                 """
             ),
         ],
-        relatedPrinciples: [.f3]
+        relatedPrinciples: [.f1]
     )
 
     // MARK: - 手段2: NavigationStack は Feature の Root にのみ置く
@@ -179,7 +179,7 @@ enum PracticeInfoProvider {
                 """
             ),
         ],
-        relatedPrinciples: [.p2, .c3]
+        relatedPrinciples: [.p1, .c1]
     )
 
     // MARK: - 手段6: Feature 間遷移は Event として上位に委譲する
@@ -213,7 +213,7 @@ enum PracticeInfoProvider {
                 """
             ),
         ],
-        relatedPrinciples: [.e2, .f2]
+        relatedPrinciples: [.e1, .f2]
     )
 
     // MARK: - 手段7: 遷移を指示するコードは状態を書き換えるだけにする
@@ -321,7 +321,7 @@ enum PracticeInfoProvider {
                 """
             ),
         ],
-        relatedPrinciples: [.f1, .f3]
+        relatedPrinciples: [.f1]
     )
 
     // MARK: - 手段10: UIKit App 層 + SwiftUI Feature 層で構成する
@@ -554,7 +554,7 @@ enum PracticeInfoProvider {
                 """
             ),
         ],
-        relatedPrinciples: [.f2, .e2]
+        relatedPrinciples: [.f2, .e1]
     )
 
     // MARK: - 手段12: Router は Environment で Feature 内に公開する

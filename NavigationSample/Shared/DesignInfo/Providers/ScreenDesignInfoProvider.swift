@@ -17,7 +17,7 @@ enum ScreenDesignInfoProvider {
         layer: .feature,
         rootViewName: "UserGridViewController",
         patterns: [.patternB, .patternD],
-        appliedPrinciples: [.s1, .s2, .r1, .r2, .e2],
+        appliedPrinciples: [.s1, .s2, .r1, .r2, .e1],
         description: """
         UIKit の UICollectionView でユーザ一覧をグリッド表示。
         各セルは UIHostingConfiguration を使い SwiftUI で実装している。
@@ -56,7 +56,7 @@ enum ScreenDesignInfoProvider {
         layer: .view,
         rootViewName: "UserPhotoListView",
         patterns: [.featurePush],
-        appliedPrinciples: [.s1, .s2, .f1, .f3, .r1],
+        appliedPrinciples: [.s1, .s2, .f1, .r1],
         description: """
         UserDetail Feature 内で push 遷移で表示される写真一覧画面。
         写真タップで写真詳細画面にさらに push 遷移する。
@@ -71,7 +71,7 @@ enum ScreenDesignInfoProvider {
         layer: .view,
         rootViewName: "UserPhotoDetailView",
         patterns: [.featurePush],
-        appliedPrinciples: [.s1, .s2, .f1, .f3, .r1],
+        appliedPrinciples: [.s1, .s2, .f1, .r1],
         description: """
         UserDetail Feature 内で push 遷移で表示される写真詳細画面。
         Feature 内の最深部の画面。戻るボタンで NavigationStack が pop を処理する。
@@ -87,7 +87,7 @@ enum ScreenDesignInfoProvider {
         layer: .feature,
         rootViewName: "LikeSendRootView",
         patterns: [.patternA],
-        appliedPrinciples: [.c1, .c3, .p2, .r2, .e1],
+        appliedPrinciples: [.c1, .p1, .r2, .e1],
         description: """
         独立した LikeSend Feature。UserDetail Feature からセミモーダルで表示される。
         LikeSendRootView が Feature エントリポイントで、UIKit の LikeSendViewController を \
@@ -105,7 +105,7 @@ enum ScreenDesignInfoProvider {
         layer: .view,
         rootViewName: "SettingsRootView",
         patterns: [.featureRoot],
-        appliedPrinciples: [.s1, .s2, .f2, .r1, .e2],
+        appliedPrinciples: [.s1, .s2, .f2, .r1, .e1],
         description: """
         Settings Feature の起点画面。Feature 内に push 遷移を持たず、
         Event 委譲のみで App 層と連携する最小構成の Feature。

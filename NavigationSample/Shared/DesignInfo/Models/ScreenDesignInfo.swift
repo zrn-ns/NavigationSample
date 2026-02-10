@@ -48,19 +48,15 @@ struct ScreenDesignInfo: Identifiable {
         // 文脈構造
         case c1 = "C1: 単一文脈原則"
         case c2 = "C2: 階層スコープ原則"
-        case c3 = "C3: 文脈停止原則"
         // Feature 境界
         case f1 = "F1: Push限定原則"
         case f2 = "F2: 切断遷移原則"
-        case f3 = "F3: Path境界原則"
         // 状態分離
         case p1 = "P1: Push/Modal分離原則"
-        case p2 = "P2: Modalスコープ原則"
         // 責務分離
         case r1 = "R1: View無決定権原則"
         case r2 = "R2: 開始者終了原則"
         // 結果伝達
-        case e1 = "E1: 終了結果原則"
-        case e2 = "E2: Event委譲原則"
+        case e1 = "E1: 結果伝達原則"
     }
 }

@@ -21,7 +21,7 @@ enum PrincipleInfoProvider {
 
     /// 全原則の情報
     static let all: [PrincipleInfo] = [
-        s1, s2, c1, c2, c3, f1, f2, f3, p1, p2, r1, r2, e1, e2,
+        s1, s2, c1, c2, f1, f2, p1, r1, r2, e1,
     ]
 
     /// カテゴリ別にグループ化された原則情報
@@ -43,11 +43,11 @@ enum PrincipleInfoProvider {
     static let navigationPatternMatrix: [(pattern: String, principles: [ScreenDesignInfo.Principle])] = [
         ("全画面共通", [.s1, .s2]),
         ("NavigationStack (push)", [.c1, .c2, .f1, .p1, .r2]),
-        ("Modal 表示", [.c1, .c2, .c3, .p2, .r2, .e1, .e2]),
-        ("Feature 内遷移", [.f1, .f3]),
-        ("Feature 間遷移", [.f2, .e2]),
+        ("Modal 表示", [.c1, .c2, .p1, .r2, .e1]),
+        ("Feature 内遷移", [.f1]),
+        ("Feature 間遷移", [.f2, .e1]),
         ("View 実装", [.r1, .s2]),
-        ("RootView 設計", [.p1, .p2, .r2]),
+        ("RootView 設計", [.p1, .r2]),
     ]
 
     // MARK: - 状態駆動
@@ -116,6 +116,12 @@ enum PrincipleInfoProvider {
         同時に有効なものは1つだけである。\
         この原則を意識することで、ナビゲーション文脈の衝突や\
         予期しない振る舞いを防げる。
+
+        文脈が切り替わると、元の文脈は一時停止される。\
+        NavigationStack の path は保持されるが操作対象ではなくなる。\
+        dismiss / pop により元の文脈が再開される。\
+        この仕組みを理解することで、Modal 表示中に\
+        背後の NavigationStack を操作してしまうようなバグを防げる。
         """,
         codeExamples: [
             .init(
@@ -150,22 +156,6 @@ enum PrincipleInfoProvider {
         codeExamples: []
     )
 
-    static let c3 = PrincipleInfo(
-        principle: .c3,
-        category: "文脈構造",
-        explanation: "文脈が切り替わると、元の文脈は一時停止される",
-        detailedExplanation: """
-        文脈が切り替わると、元の文脈は一時停止される。\
-        NavigationStack の path は保持されるが操作対象ではなくなる。\
-        dismiss / pop により元の文脈が再開される。
-
-        この仕組みを理解することで、Modal 表示中に\
-        背後の NavigationStack を操作してしまうような\
-        バグを防げる。
-        """,
-        codeExamples: []
-    )
-
     // MARK: - Feature 境界
 
     static let f1 = PrincipleInfo(
@@ -179,36 +169,10 @@ enum PrincipleInfoProvider {
 
         Feature を跨ぐ場合は push ではなく、\
         Modal や Tab 切り替えなどの「文脈の切断」を用いる。
-        """,
-        codeExamples: []
-    )
 
-    static let f2 = PrincipleInfo(
-        principle: .f2,
-        category: "Feature境界",
-        explanation: "Feature を跨ぐ遷移は「文脈の切断」として扱う",
-        detailedExplanation: """
-        Feature を跨ぐ遷移の手段は以下に限定される:
-        ・Tab 切り替え
-        ・Modal 表示
-        ・上位 NavigationStack での例外的 push
-
-        これらはいずれも「現在の文脈を一時停止し、\
-        新しい文脈を開始する」という意味を持つ。
-        """,
-        codeExamples: []
-    )
-
-    static let f3 = PrincipleInfo(
-        principle: .f3,
-        category: "Feature境界",
-        explanation: "Path は Feature 境界を越えない",
-        detailedExplanation: """
-        Feature ごとに Path を定義し、\
-        グローバル Path は最小限にとどめる。
-
-        Path が Feature 境界を越えると、\
-        Feature 間の結合度が高くなり、\
+        この原則を型レベルで強制するため、Path は Feature 境界を越えない。\
+        Feature ごとに Path を定義し、グローバル Path は最小限にとどめる。\
+        Path が Feature 境界を越えると、Feature 間の結合度が高くなり、\
         独立した開発やテストが困難になる。
         """,
         codeExamples: [
@@ -228,6 +192,22 @@ enum PrincipleInfoProvider {
         ]
     )
 
+    static let f2 = PrincipleInfo(
+        principle: .f2,
+        category: "Feature境界",
+        explanation: "Feature を跨ぐ遷移は「文脈の切断」として扱う",
+        detailedExplanation: """
+        Feature を跨ぐ遷移の手段は以下に限定される:
+        ・Tab 切り替え
+        ・Modal 表示
+        ・上位 NavigationStack での例外的 push
+
+        これらはいずれも「現在の文脈を一時停止し、\
+        新しい文脈を開始する」という意味を持つ。
+        """,
+        codeExamples: []
+    )
+
     // MARK: - 状態分離
 
     static let p1 = PrincipleInfo(
@@ -241,6 +221,14 @@ enum PrincipleInfoProvider {
         これらを分離することで、push と Modal の\
         ライフサイクルが互いに干渉せず、\
         状態管理がシンプルになる。
+
+        分離の根拠として、Modal は「一時的 UI」ではなく\
+        「独立した文脈」であることが挙げられる。\
+        Modal は dismiss により文脈復帰が起きる独立した文脈であり、\
+        内部に独自の Navigation を持つことができる。\
+        Modal enum は「文脈のスコープ」で定義する\
+        （App 文脈 → MainTabModal、Feature 文脈 → FeatureModal）。\
+        画面単位では定義しない。
         """,
         codeExamples: [
             .init(
@@ -253,22 +241,6 @@ enum PrincipleInfoProvider {
                 """
             ),
         ]
-    )
-
-    static let p2 = PrincipleInfo(
-        principle: .p2,
-        category: "状態分離",
-        explanation: "Modal は「一時的 UI」ではなく「独立した文脈」である",
-        detailedExplanation: """
-        Modal は dismiss により文脈復帰が起きる独立した文脈である。\
-        内部に独自の Navigation を持つことができる。
-
-        Modal enum は「文脈のスコープ」で定義する:
-        ・App 文脈 → MainTabModal
-        ・Feature 文脈 → FeatureModal
-        ・画面単位では定義しない
-        """,
-        codeExamples: []
     )
 
     // MARK: - 責務分離
@@ -331,27 +303,18 @@ enum PrincipleInfoProvider {
     static let e1 = PrincipleInfo(
         principle: .e1,
         category: "結果伝達",
-        explanation: "「画面を閉じる」とは「文脈を終了させる」ことであり、結果を伴う",
+        explanation: "文脈の終了には結果が伴い、イベントとして上位に伝達する",
         detailedExplanation: """
         pop / dismiss は UI 命令ではなく、\
         現在の文脈が終了したという状態遷移の結果である。
 
         文脈の終了には、成功・キャンセル・失敗など\
         ドメイン上の意味ある結果が伴う。\
-        この結果を適切に上位レイヤーに伝達することで、\
-        後続処理を正しく行える。
-        """,
-        codeExamples: []
-    )
+        この結果は「閉じる命令」ではなく「イベント」として\
+        上位レイヤーに伝達する。
 
-    static let e2 = PrincipleInfo(
-        principle: .e2,
-        category: "結果伝達",
-        explanation: "Modal 内の処理結果は「閉じる命令」ではなく「イベント」として返す",
-        detailedExplanation: """
         ModalView は処理結果を Result として上位に返し、\
-        上位が結果を解釈して Modal を閉じる。
-
+        上位が結果を解釈して Modal を閉じる。\
         Feature 間の連携も Event として上位に委譲する。\
         これにより Feature は他の Feature の存在を知らずに済み、\
         疎結合なアーキテクチャが実現できる。
