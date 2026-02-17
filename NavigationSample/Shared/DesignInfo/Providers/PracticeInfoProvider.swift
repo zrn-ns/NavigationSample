@@ -280,7 +280,7 @@ enum PracticeInfoProvider {
                 """
             ),
         ],
-        relatedPrinciples: [.r2]
+        relatedPrinciples: [.r2, .f2]
     )
 
     // MARK: - 手段9: push 用 path は型安全な [Path] を使用する
