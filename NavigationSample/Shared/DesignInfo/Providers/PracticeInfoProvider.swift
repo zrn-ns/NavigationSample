@@ -433,14 +433,10 @@ enum PracticeInfoProvider {
         ・UINavigationController でラップして modal 表示
         ・閉じるときだけ SwiftUI 側に onDismiss で通知
 
-        パターン B: UIKit グリッドから SwiftUI Feature を push 遷移
-        ・UINavigationController を UIKit Coordinator が保持
-        ・SwiftUI Feature を UIHostingController でラップして push
-        ・push された Feature 内では独自の NavigationStack で Feature 内遷移が可能
-
         パターン C: UIKit 画面から SwiftUI Feature を modal 表示
         ・UIHostingController で SwiftUI View をラップして present
         ・onEvent クロージャで UIKit 側にイベントを伝達
+        ・push 風の UX が必要な場合は fullScreenModal + カスタムトランジションで実現する（手段8）
 
         パターン D: UIKit 画面の一部を SwiftUI で構築
         ・UIHostingController を child view controller として追加
@@ -474,33 +470,6 @@ enum PracticeInfoProvider {
                         LegacyProfileModalView(
                             user: viewModel.user,
                             onDismiss: { router.dismissModal() }
-                        )
-                    }
-                }
-                """
-            ),
-            .init(
-                description: "パターン B: UIKit グリッドから SwiftUI Feature を push 遷移",
-                code: """
-                // UIKit Coordinator
-                @MainActor
-                final class UserGridCoordinator {
-                    private let navigationController: UINavigationController
-
-                    func showUserDetail(user: User) {
-                        let router = UserDetailRouter()
-                        let viewModel = UserDetailViewModel(user: user)
-                        let detailRootView = UserDetailRootView(
-                            router: router,
-                            viewModel: viewModel,
-                            onEvent: { [weak self] event in
-                                self?.handle(event)
-                            }
-                        )
-                        let hostingController = UIHostingController(rootView: detailRootView)
-                        navigationController.pushViewController(
-                            hostingController,
-                            animated: true
                         )
                     }
                 }
