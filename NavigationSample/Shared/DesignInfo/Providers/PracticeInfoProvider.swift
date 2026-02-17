@@ -433,12 +433,12 @@ enum PracticeInfoProvider {
         ・UINavigationController でラップして modal 表示
         ・閉じるときだけ SwiftUI 側に onDismiss で通知
 
-        パターン C: UIKit 画面から SwiftUI Feature を modal 表示
+        パターン B: UIKit 画面から SwiftUI Feature を modal 表示
         ・UIHostingController で SwiftUI View をラップして present
         ・onEvent クロージャで UIKit 側にイベントを伝達
         ・push 風の UX が必要な場合は fullScreenModal + カスタムトランジションで実現する（手段8）
 
-        パターン D: UIKit 画面の一部を SwiftUI で構築
+        パターン C: UIKit 画面の一部を SwiftUI で構築
         ・UIHostingController を child view controller として追加
         ・Auto Layout で SwiftUI View のサイズ・位置を制御
         ・SwiftUI View からのイベントはクロージャで UIKit 側に伝達
@@ -476,7 +476,7 @@ enum PracticeInfoProvider {
                 """
             ),
             .init(
-                description: "パターン C: UIKit 画面から SwiftUI Feature を modal 表示",
+                description: "パターン B: UIKit 画面から SwiftUI Feature を modal 表示",
                 code: """
                 final class SomeViewController: UIViewController {
                     private func presentSwiftUIFeature() {
@@ -491,7 +491,7 @@ enum PracticeInfoProvider {
                 """
             ),
             .init(
-                description: "パターン D: UIKit 画面の一部を SwiftUI で構築",
+                description: "パターン C: UIKit 画面の一部を SwiftUI で構築",
                 code: """
                 final class HybridViewController: UIViewController {
                     private var hostingController: UIHostingController<SomeSwiftUIView>?

@@ -32,8 +32,8 @@ struct ScreenDesignInfo: Identifiable {
     /// 実装パターン
     enum Pattern: String, CaseIterable {
         case patternA = "パターン A: SwiftUI Feature 内で UIKit 画面を modal 表示"
-        case patternC = "パターン C: UIKit 画面から SwiftUI Feature を modal 表示"
-        case patternD = "パターン D: UIKit 画面の一部を SwiftUI で構築"
+        case patternB = "パターン B: UIKit 画面から SwiftUI Feature を modal 表示"
+        case patternC = "パターン C: UIKit 画面の一部を SwiftUI で構築"
         case featureRoot = "Feature Root (NavigationStack)"
         case featurePush = "Feature 内 push"
         case featureModal = "Feature 内 modal"
