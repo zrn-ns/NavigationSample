@@ -45,7 +45,7 @@ enum ScreenDesignInfoProvider {
         ・standard — Home タブからの遷移。左上に「← 戻る」ボタン、「いいね！」ボタンあり。
         ・me — 設定タブからのプロフィールプレビュー。右上に「×」ボタン（iOS 慣例の閉じるボタン配置）、\
         「いいね！」ボタンなし。
-        どちらも dismiss() → Event(.dismissed) で App 層に終了を通知する点は共通（R2, E2）。
+        どちらも requestClose() → Event(.closeRequested) で App 層に終了を通知する点は共通（R2, E2）。
         """
     )
 

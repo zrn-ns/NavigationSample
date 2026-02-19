@@ -72,7 +72,7 @@ final class UserGridCoordinator {
     /// UserDetail Feature からのイベントをハンドリング
     private func handle(_ event: UserDetailEvent) {
         switch event {
-        case .dismissed:
+        case .closeRequested:
             presentedDetailVC?.dismiss(animated: true)
             presentedDetailVC = nil
 

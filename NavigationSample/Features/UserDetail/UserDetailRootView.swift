@@ -46,7 +46,11 @@ struct UserDetailRootView: View {
                     case .photoDetail(let photoId):
                         UserPhotoDetailView(
                             photos: viewModel.user.photos,
-                            photoId: photoId
+                            photoId: photoId,
+                            isLiked: viewModel.isLiked,
+                            onLikeTap: viewModel.displayMode == .standard
+                                ? { router.showLikeSend() }
+                                : nil
                         )
                         .blockUserToolbar(displayMode: viewModel.displayMode) {
                             viewModel.blockUser()
@@ -64,9 +68,10 @@ struct UserDetailRootView: View {
                         switch event {
                         case .liked(let type):
                             router.dismissModal()
+                            router.navigateToRoot()
                             viewModel.sendLike(type)
                             viewModel.sendEvent(.liked(userId: viewModel.user.id, type: type))
-                        case .dismissed:
+                        case .closeRequested:
                             router.dismissModal()
                         }
                     }

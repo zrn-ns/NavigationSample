@@ -21,7 +21,7 @@ struct LikeSendRootView: View {
                 onEvent(.liked(type: type))
             },
             onDismiss: {
-                onEvent(.dismissed)
+                onEvent(.closeRequested)
             }
         )
         .presentationDetents([.medium])
