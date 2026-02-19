@@ -9,6 +9,8 @@ import SwiftUI
 struct UserPhotoDetailView: View {
     let photos: [User.Photo]
     let photoId: User.Photo.ID
+    var isLiked: Bool = false
+    var onLikeTap: (() -> Void)? = nil
 
     private var photo: User.Photo? {
         photos.first { $0.id == photoId }
@@ -32,6 +34,22 @@ struct UserPhotoDetailView: View {
                         .foregroundStyle(.secondary)
                 }
 
+                if let onLikeTap {
+                    Button {
+                        onLikeTap()
+                    } label: {
+                        Label(
+                            isLiked ? "いいね済" : "いいね！",
+                            systemImage: "heart.fill"
+                        )
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(isLiked ? .gray : .pink)
+                    .disabled(isLiked)
+                    .padding(.horizontal)
+                }
+
                 Spacer()
             } else {
                 Text("写真が見つかりません")
@@ -44,11 +62,32 @@ struct UserPhotoDetailView: View {
     }
 }
 
-#Preview {
+#Preview("ボタンなし") {
     NavigationStack {
         UserPhotoDetailView(
             photos: User.samples[0].photos,
             photoId: User.samples[0].photos[0].id
+        )
+    }
+}
+
+#Preview("いいねボタンあり") {
+    NavigationStack {
+        UserPhotoDetailView(
+            photos: User.samples[0].photos,
+            photoId: User.samples[0].photos[0].id,
+            onLikeTap: {}
+        )
+    }
+}
+
+#Preview("いいね済") {
+    NavigationStack {
+        UserPhotoDetailView(
+            photos: User.samples[0].photos,
+            photoId: User.samples[0].photos[0].id,
+            isLiked: true,
+            onLikeTap: {}
         )
     }
 }
