@@ -8,6 +8,6 @@ enum LikeSendEvent {
     /// いいね送信完了
     case liked(type: LikeType)
 
-    /// キャンセル（モーダルを閉じる）
-    case dismissed
+    /// ユーザが Feature の終了を要求した
+    case closeRequested
 }

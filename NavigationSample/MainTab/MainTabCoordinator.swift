@@ -76,7 +76,7 @@ final class MainTabCoordinator {
 
     private func handleProfilePreviewEvent(_ event: UserDetailEvent) {
         switch event {
-        case .dismissed:
+        case .closeRequested:
             dismissModal()
         case .liked:
             // プレビューなのでいいねは無視

@@ -45,9 +45,9 @@ final class UserDetailViewModel {
         onEvent?(event)
     }
 
-    /// 詳細画面を閉じる（戻る）
-    func dismiss() {
-        sendEvent(.dismissed)
+    /// Feature の終了を要求する
+    func requestClose() {
+        sendEvent(.closeRequested)
     }
 
     /// ユーザをブロックする（実際のアプリでは API リクエストを行う）

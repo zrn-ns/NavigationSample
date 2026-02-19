@@ -66,7 +66,7 @@ struct UserDetailRootView: View {
                             router.dismissModal()
                             viewModel.sendLike(type)
                             viewModel.sendEvent(.liked(userId: viewModel.user.id, type: type))
-                        case .dismissed:
+                        case .closeRequested:
                             router.dismissModal()
                         }
                     }
