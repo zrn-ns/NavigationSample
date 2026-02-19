@@ -227,14 +227,14 @@ enum PracticeInfoProvider {
 
         遷移の意味と対応するコード:
         ・Feature 内 push → path.append(destination) — RootView で実行
-        ・Feature 内 pop → path.removeLast() — RootView で実行
+        ・Feature 内 pop → router.navigateBack() — View で実行
         ・Feature 内 modal → modal = .xxx — RootView で実行
         ・modal dismiss → modal = nil — RootView で実行
         ・Feature 跨ぎ → send(Event) — View で実行
         ・App modal（SwiftUI） → appModal = .xxx — App 層で実行
         ・App modal（UIKit） → present(hostingController, animated:) — Coordinator で実行
         ・modal dismiss（UIKit） → dismiss(animated:) — Coordinator で実行
-        ・文脈終了の意図表明 → dismiss() — View で実行
+        ・文脈終了の意図表明 → requestClose() — View で実行
         """,
         codeExamples: [],
         relatedPrinciples: [.s1]
