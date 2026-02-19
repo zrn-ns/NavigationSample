@@ -18,9 +18,20 @@ final class UserDetailRouter {
     /// Feature 内の modal 状態
     var modal: UserDetailModal?
 
-    /// push 遷移
-    func navigate(to destination: UserDetailPath) {
+    /// push 遷移（内部専用）
+    private func navigate(to destination: UserDetailPath) {
         path.append(destination)
+    }
+
+    /// 1つ前の画面に戻る
+    func navigateBack() {
+        guard !path.isEmpty else { return }
+        path.removeLast()
+    }
+
+    /// ルート画面に戻る
+    func navigateToRoot() {
+        path.removeAll()
     }
 
     /// 写真一覧を表示
