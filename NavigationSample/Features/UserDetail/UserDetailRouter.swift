@@ -5,10 +5,10 @@
 
 import SwiftUI
 
-/// UserDetail Feature の遷移状態を管理
+/// UserDetail Feature の遷移状態・イベント通知を管理
 ///
-/// push / modal の遷移のみを責務とする。
-/// データ保持・イベント通知は UserDetailViewModel が担当。
+/// push / modal の遷移と、Feature 外への通知を責務とする。
+/// データ保持・ビジネスロジックは UserDetailViewModel が担当。
 @MainActor
 @Observable
 final class UserDetailRouter {
@@ -17,6 +17,19 @@ final class UserDetailRouter {
 
     /// Feature 内の modal 状態
     var modal: UserDetailModal?
+
+    /// 上位へのイベント通知
+    var onEvent: ((UserDetailEvent) -> Void)?
+
+    /// 上位へイベントを発火
+    func sendEvent(_ event: UserDetailEvent) {
+        onEvent?(event)
+    }
+
+    /// Feature の終了を要求する
+    func requestClose() {
+        sendEvent(.closeRequested)
+    }
 
     /// push 遷移（内部専用）
     private func navigate(to destination: UserDetailPath) {

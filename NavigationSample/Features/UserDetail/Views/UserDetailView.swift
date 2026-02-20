@@ -25,7 +25,7 @@ struct UserDetailView: View {
             if viewModel.displayMode == .standard {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        viewModel.requestClose()
+                        router.requestClose()
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "chevron.left")
@@ -37,7 +37,7 @@ struct UserDetailView: View {
             if viewModel.displayMode == .me {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        viewModel.requestClose()
+                        router.requestClose()
                     } label: {
                         Image(systemName: "xmark")
                     }

@@ -230,11 +230,11 @@ enum PracticeInfoProvider {
         ・Feature 内 pop → Router に移譲 → path.removeLast()
         ・Feature 内 modal → Router に移譲 → modal = .xxx
         ・modal dismiss → Router に移譲 → modal = nil
-        ・Feature 跨ぎ → send(Event) — View で実行
+        ・Feature 跨ぎ → Router に移譲 → sendEvent(.xxx)
         ・App modal（SwiftUI） → appModal = .xxx — App 層で実行
         ・App modal（UIKit） → present(hostingController, animated:) — Coordinator で実行
         ・modal dismiss（UIKit） → dismiss(animated:) — Coordinator で実行
-        ・文脈終了の意図表明 → requestClose() — View で実行
+        ・文脈終了の意図表明 → Router に移譲 → requestClose()
         """,
         codeExamples: [],
         relatedPrinciples: [.s1]

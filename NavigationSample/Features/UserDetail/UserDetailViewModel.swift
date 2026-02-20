@@ -26,9 +26,6 @@ final class UserDetailViewModel {
     /// いいね済みかどうか（実際のアプリでは API から取得した初期値を使用）
     var isLiked: Bool
 
-    /// 上位へのイベント通知
-    var onEvent: ((UserDetailEvent) -> Void)?
-
     init(user: User, displayMode: DisplayMode = .standard, isLiked: Bool = false) {
         self.user = user
         self.displayMode = displayMode
@@ -40,18 +37,9 @@ final class UserDetailViewModel {
         isLiked = true
     }
 
-    /// 上位へイベントを発火
-    func sendEvent(_ event: UserDetailEvent) {
-        onEvent?(event)
-    }
-
-    /// Feature の終了を要求する
-    func requestClose() {
-        sendEvent(.closeRequested)
-    }
-
     /// ユーザをブロックする（実際のアプリでは API リクエストを行う）
     func blockUser() {
-        sendEvent(.blocked(userId: user.id))
+        // API リクエスト等のビジネスロジック
+        // イベント通知は呼び出し元が Router 経由で行う
     }
 }
