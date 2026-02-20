@@ -31,6 +31,7 @@ struct UserDetailRootView: View {
             UserDetailView(viewModel: viewModel)
                 .blockUserToolbar(displayMode: viewModel.displayMode) {
                     viewModel.blockUser()
+                    router.sendEvent(.blocked(userId: viewModel.user.id))
                 }
                 .navigationDestination(for: UserDetailPath.self) { destination in
                     switch destination {
@@ -41,6 +42,7 @@ struct UserDetailRootView: View {
                         )
                         .blockUserToolbar(displayMode: viewModel.displayMode) {
                             viewModel.blockUser()
+                            router.sendEvent(.blocked(userId: viewModel.user.id))
                         }
 
                     case .photoDetail(let photoId):
@@ -54,6 +56,7 @@ struct UserDetailRootView: View {
                         )
                         .blockUserToolbar(displayMode: viewModel.displayMode) {
                             viewModel.blockUser()
+                            router.sendEvent(.blocked(userId: viewModel.user.id))
                         }
                     }
                 }
@@ -70,7 +73,7 @@ struct UserDetailRootView: View {
                             router.dismissModal()
                             router.navigateToRoot()
                             viewModel.sendLike(type)
-                            viewModel.sendEvent(.liked(userId: viewModel.user.id, type: type))
+                            router.sendEvent(.liked(userId: viewModel.user.id, type: type))
                         case .closeRequested:
                             router.dismissModal()
                         }
@@ -79,7 +82,7 @@ struct UserDetailRootView: View {
             }
         }
         .onAppear {
-            viewModel.onEvent = onEvent
+            router.onEvent = onEvent
         }
     }
 }
