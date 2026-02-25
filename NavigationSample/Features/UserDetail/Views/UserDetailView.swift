@@ -7,8 +7,10 @@ import SwiftUI
 
 /// ユーザ詳細画面
 struct UserDetailView: View {
-    @Environment(UserDetailRouter.self) private var router
     let viewModel: UserDetailViewModel
+    var onClose: (() -> Void)?
+    var onShowPhotos: (() -> Void)?
+    var onShowLikeSend: (() -> Void)?
 
     var body: some View {
         ScrollView {
@@ -25,7 +27,7 @@ struct UserDetailView: View {
             if viewModel.displayMode == .standard {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        router.requestClose()
+                        onClose?()
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "chevron.left")
@@ -37,7 +39,7 @@ struct UserDetailView: View {
             if viewModel.displayMode == .me {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        router.requestClose()
+                        onClose?()
                     } label: {
                         Image(systemName: "xmark")
                     }
@@ -81,7 +83,7 @@ struct UserDetailView: View {
     private var actionButtons: some View {
         VStack(spacing: 12) {
             Button {
-                router.showPhotos()
+                onShowPhotos?()
             } label: {
                 Label("写真を見る", systemImage: "photo.on.rectangle")
                     .frame(maxWidth: .infinity)
@@ -90,7 +92,7 @@ struct UserDetailView: View {
 
             if viewModel.displayMode == .standard {
                 Button {
-                    router.showLikeSend()
+                    onShowLikeSend?()
                 } label: {
                     Label(
                         viewModel.isLiked ? "いいね済" : "いいね！",
@@ -108,7 +110,6 @@ struct UserDetailView: View {
 
 #Preview {
     NavigationStack {
-        UserDetailView(viewModel: UserDetailViewModel(user: User.samples[0]))
+        UserDetailView(viewModel: UserDetailViewModel(user: User.samples[0]), onClose: {})
     }
-    .environment(UserDetailRouter())
 }
