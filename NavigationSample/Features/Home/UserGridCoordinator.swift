@@ -49,7 +49,6 @@ final class UserGridCoordinator {
                 self?.handle(event)
             }
         )
-        .environment(\.swipeDismissalInteractor, transitioningDelegate.dismissalInteractor)
 
         let hostingController = UIHostingController(rootView: detailRootView)
 

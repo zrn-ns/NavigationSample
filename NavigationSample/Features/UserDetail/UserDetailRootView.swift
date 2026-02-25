@@ -67,7 +67,6 @@ struct UserDetailRootView: View {
                     }
                 }
         }
-        .swipeDismissable(isAtRoot: path.isEmpty)
         .sheet(item: $modal) { modal in
             switch modal {
             case .likeSend:
