@@ -28,10 +28,13 @@ struct UserDetailRootView: View {
 
     var body: some View {
         NavigationStack(path: $router.path) {
-            UserDetailView(viewModel: viewModel)
+            UserDetailView(
+                viewModel: viewModel,
+                onClose: { onEvent(.closeRequested) }
+            )
                 .blockUserToolbar(displayMode: viewModel.displayMode) {
                     viewModel.blockUser()
-                    router.sendEvent(.blocked(userId: viewModel.user.id))
+                    onEvent(.blocked(userId: viewModel.user.id))
                 }
                 .navigationDestination(for: UserDetailPath.self) { destination in
                     switch destination {
@@ -42,7 +45,7 @@ struct UserDetailRootView: View {
                         )
                         .blockUserToolbar(displayMode: viewModel.displayMode) {
                             viewModel.blockUser()
-                            router.sendEvent(.blocked(userId: viewModel.user.id))
+                            onEvent(.blocked(userId: viewModel.user.id))
                         }
 
                     case .photoDetail(let photoId):
@@ -56,7 +59,7 @@ struct UserDetailRootView: View {
                         )
                         .blockUserToolbar(displayMode: viewModel.displayMode) {
                             viewModel.blockUser()
-                            router.sendEvent(.blocked(userId: viewModel.user.id))
+                            onEvent(.blocked(userId: viewModel.user.id))
                         }
                     }
                 }
@@ -73,16 +76,13 @@ struct UserDetailRootView: View {
                             router.dismissModal()
                             router.navigateToRoot()
                             viewModel.sendLike(type)
-                            router.sendEvent(.liked(userId: viewModel.user.id, type: type))
+                            onEvent(.liked(userId: viewModel.user.id, type: type))
                         case .closeRequested:
                             router.dismissModal()
                         }
                     }
                 )
             }
-        }
-        .onAppear {
-            router.onEvent = onEvent
         }
     }
 }

@@ -9,6 +9,7 @@ import SwiftUI
 struct UserDetailView: View {
     @Environment(UserDetailRouter.self) private var router
     let viewModel: UserDetailViewModel
+    var onClose: (() -> Void)?
 
     var body: some View {
         ScrollView {
@@ -25,7 +26,7 @@ struct UserDetailView: View {
             if viewModel.displayMode == .standard {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        router.requestClose()
+                        onClose?()
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "chevron.left")
@@ -37,7 +38,7 @@ struct UserDetailView: View {
             if viewModel.displayMode == .me {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        router.requestClose()
+                        onClose?()
                     } label: {
                         Image(systemName: "xmark")
                     }
@@ -108,7 +109,7 @@ struct UserDetailView: View {
 
 #Preview {
     NavigationStack {
-        UserDetailView(viewModel: UserDetailViewModel(user: User.samples[0]))
+        UserDetailView(viewModel: UserDetailViewModel(user: User.samples[0]), onClose: {})
     }
     .environment(UserDetailRouter())
 }
