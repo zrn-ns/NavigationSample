@@ -32,7 +32,7 @@ https://github.com/user-attachments/assets/d256606a-de55-4b8c-911d-4e85884a702f
 ### このサンプルが提示するもの
 
 - UIKit / SwiftUI 間のナビゲーション連携パターン（A〜C）の具体的な実装例
-- Feature 単位でナビゲーション状態を管理する Router パターン
+- Feature の RootView で @State により path / modal を直接管理し、子 View にはクロージャで遷移トリガーを渡すパターン
 - App 層（UIKit）と Feature 層（SwiftUI）の責務分離
 - Feature 境界によるフレームワーク混在リスクの回避方法
 - 設計原則に基づいた意思決定の根拠（アプリ内の設計情報タブで閲覧可能）

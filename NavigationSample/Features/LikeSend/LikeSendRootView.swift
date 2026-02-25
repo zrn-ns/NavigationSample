@@ -7,7 +7,7 @@ import SwiftUI
 
 /// LikeSend Feature のエントリポイント
 ///
-/// 単画面の Feature のため NavigationStack・Router は不要。
+/// 単画面の Feature のため NavigationStack は不要。
 /// UIKit の LikeSendViewController を UIViewControllerRepresentable でラップし、
 /// セミモーダル（.presentationDetents([.medium])）で表示する（パターン A）。
 struct LikeSendRootView: View {

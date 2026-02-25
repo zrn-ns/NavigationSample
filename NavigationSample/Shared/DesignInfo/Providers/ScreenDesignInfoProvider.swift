@@ -39,13 +39,13 @@ enum ScreenDesignInfoProvider {
         description: """
         UserDetail Feature の起点画面。NavigationStack の root として機能し、
         Feature 内で push 遷移（写真一覧・写真詳細）と modal 表示（いいね送信画面）を管理する。
-        UserDetailRouter を Environment で子 View に公開。
+        path / modal を @State で直接管理し、子 View にはクロージャで遷移トリガーを渡す。
 
         DisplayMode による表示パターンの違い:
         ・standard — Home タブからの遷移。左上に「← 戻る」ボタン、「いいね！」ボタンあり。
         ・me — 設定タブからのプロフィールプレビュー。右上に「×」ボタン（iOS 慣例の閉じるボタン配置）、\
         「いいね！」ボタンなし。
-        どちらも requestClose() → Event(.closeRequested) で App 層に終了を通知する点は共通（R2, E2）。
+        どちらも onEvent(.closeRequested) で App 層に終了を通知する点は共通（R2, E1）。
         """
     )
 
@@ -60,7 +60,7 @@ enum ScreenDesignInfoProvider {
         description: """
         UserDetail Feature 内で push 遷移で表示される写真一覧画面。
         写真タップで写真詳細画面にさらに push 遷移する。
-        Router を通じて遷移を要求し、View 自身は遷移を決定しない（R1）。
+        クロージャを通じて遷移を要求し、View 自身は遷移を決定しない（R1）。
         """
     )
 

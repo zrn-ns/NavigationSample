@@ -41,6 +41,6 @@ final class UserDetailViewModel {
     /// ユーザをブロックする（実際のアプリでは API リクエストを行う）
     func blockUser() {
         // API リクエスト等のビジネスロジック
-        // イベント通知は呼び出し元が Router 経由で行う
+        // イベント通知は呼び出し元が onEvent クロージャ経由で行う
     }
 }
