@@ -7,9 +7,10 @@ import SwiftUI
 
 /// ユーザ詳細画面
 struct UserDetailView: View {
-    @Environment(UserDetailRouter.self) private var router
     let viewModel: UserDetailViewModel
     var onClose: (() -> Void)?
+    var onShowPhotos: (() -> Void)?
+    var onShowLikeSend: (() -> Void)?
 
     var body: some View {
         ScrollView {
@@ -82,7 +83,7 @@ struct UserDetailView: View {
     private var actionButtons: some View {
         VStack(spacing: 12) {
             Button {
-                router.showPhotos()
+                onShowPhotos?()
             } label: {
                 Label("写真を見る", systemImage: "photo.on.rectangle")
                     .frame(maxWidth: .infinity)
@@ -91,7 +92,7 @@ struct UserDetailView: View {
 
             if viewModel.displayMode == .standard {
                 Button {
-                    router.showLikeSend()
+                    onShowLikeSend?()
                 } label: {
                     Label(
                         viewModel.isLiked ? "いいね済" : "いいね！",
@@ -111,5 +112,4 @@ struct UserDetailView: View {
     NavigationStack {
         UserDetailView(viewModel: UserDetailViewModel(user: User.samples[0]), onClose: {})
     }
-    .environment(UserDetailRouter())
 }
