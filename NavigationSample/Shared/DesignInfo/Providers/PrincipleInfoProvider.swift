@@ -235,11 +235,11 @@ enum PrincipleInfoProvider {
         """,
         codeExamples: [
             .init(
-                description: "Router で push と modal の状態を分離する例",
+                description: "RootView の @State で push と modal の状態を分離する例",
                 code: """
-                @Observable final class FeatureRouter {
-                    var path: [FeaturePath] = []   // push 用
-                    var modal: FeatureModal?         // modal 用
+                struct FeatureRootView: View {
+                    @State private var path: [FeaturePath] = []   // push 用
+                    @State private var modal: FeatureModal?        // modal 用
                 }
                 """
             ),
@@ -258,38 +258,43 @@ enum PrincipleInfoProvider {
 
         View が直接 NavigationLink の遷移先を決定したり、\
         Modal を表示したりするのではなく、\
-        Router 等の上位レイヤーに「こうしたい」という意図を伝える。
+        RootView から渡されたクロージャを通じて「こうしたい」という意図を伝える。
 
-        View が Router を @Environment で参照してよいのは、\
-        その View が特定の Feature に固有であり、\
-        他の Feature で再利用されない場合に限る。\
+        RootView は @State で path / modal を管理し、\
+        子 View にはクロージャで遷移トリガーを渡す。\
+        子 View はクロージャを呼ぶだけで、遷移の実体（path.append や modal の変更）を知らない。\
         Feature に依存しない View は Feature 外の共有ディレクトリに配置し、\
-        Router に依存せずコールバックで意図を上位に委譲する。
+        コールバックで意図を上位に委譲する。
         """,
         codeExamples: [
             .init(
-                description: "View は意図を表明し、Router が遷移を決定する",
+                description: "View はクロージャで意図を表明し、RootView が遷移を決定する",
                 code: """
-                // View は意図を表明
-                Button("詳細を見る") {
-                    router.showDetail(id)  // 「詳細を見たい」という意図
+                // View はクロージャで意図を表明
+                struct UserDetailView: View {
+                    var onShowDetail: ((Item.ID) -> Void)?
+
+                    Button("詳細を見る") {
+                        onShowDetail?(id)  // 「詳細を見たい」という意図
+                    }
                 }
-                // Router が遷移方法を決定
+                // RootView が遷移方法を決定
                 """
             ),
             .init(
                 description: "Feature 固有 View と再利用可能 View の対比",
                 code: """
-                // Feature 固有 View: Router を直接参照してよい
+                // Feature 固有 View: クロージャで遷移トリガーを受け取る
                 struct UserDetailView: View {
-                    @Environment(UserDetailRouter.self) private var router
-                    // この View は UserDetail Feature 専用
+                    var onShowPhotoList: (() -> Void)?
+                    var onShowLikeSend: (() -> Void)?
+                    // RootView からクロージャ経由で遷移を委譲される
                 }
 
                 // 再利用可能 View: コールバックで意図を委譲する
                 struct UserPhotoListView: View {
                     var onSelectPhoto: (Photo.ID) -> Void
-                    // Router に依存しないため、他の Feature でも使える
+                    // Feature に依存しないため、他の Feature でも使える
                 }
                 """
             ),

@@ -134,7 +134,7 @@ enum PracticeInfoProvider {
             .init(
                 description: "item: ベースで Modal を制御する例",
                 code: """
-                .sheet(item: $router.modal) { modal in
+                .sheet(item: $modal) { modal in
                     switch modal {
                     case .likeSend:
                         LikeSendRootView(
@@ -226,15 +226,15 @@ enum PracticeInfoProvider {
         命令的な画面遷移メソッドの呼び出しは行わない。
 
         遷移の意味と対応するコード:
-        ・Feature 内 push → Router に移譲 → path.append(destination)
-        ・Feature 内 pop → Router に移譲 → path.removeLast()
-        ・Feature 内 modal → Router に移譲 → modal = .xxx
-        ・modal dismiss → Router に移譲 → modal = nil
-        ・Feature 跨ぎ → Router に移譲 → sendEvent(.xxx)
+        ・Feature 内 push → RootView の @State を変更 → path.append(destination)
+        ・Feature 内 pop → RootView の @State を変更 → path.removeLast()
+        ・Feature 内 modal → RootView の @State を変更 → modal = .xxx
+        ・modal dismiss → RootView の @State を変更 → modal = nil
+        ・Feature 跨ぎ → onEvent クロージャで上位に委譲 → onEvent(.xxx)
         ・App modal（SwiftUI） → appModal = .xxx — App 層で実行
         ・App modal（UIKit） → present(hostingController, animated:) — Coordinator で実行
         ・modal dismiss（UIKit） → dismiss(animated:) — Coordinator で実行
-        ・文脈終了の意図表明 → Router に移譲 → requestClose()
+        ・文脈終了の意図表明 → onEvent クロージャで上位に委譲 → onEvent(.closeRequested)
         """,
         codeExamples: [],
         relatedPrinciples: [.s1]
@@ -254,29 +254,32 @@ enum PracticeInfoProvider {
 
         Feature の API に表示手段に依存するパラメータ（ナビゲーション深度コールバック等）を追加しない。\
         表示手段の違いは Coordinator が吸収する。\
-        Coordinator が Feature の Router の状態を参照する必要がある場合は、\
-        Router を Coordinator で生成し Feature に渡す。
+        スワイプ dismiss の制御には Environment + ViewModifier を使う。\
+        SwipeDismissalInteractor を .environment で注入し、\
+        .swipeDismissable(isAtRoot:) ViewModifier で「ナビゲーションルートかどうか」を宣言的に制御する。
         """,
         codeExamples: [
             .init(
-                description: "Coordinator が Router を生成し状態を参照する例",
+                description: "Environment + ViewModifier でスワイプ dismiss を宣言的に制御する例",
                 code: """
-                // Coordinator が router を生成し、状態を参照する
+                // Coordinator が SwipeDismissalInteractor を生成し Environment で注入
                 func showUserDetail(user: User) {
-                    let router = UserDetailRouter()
-                    let viewModel = UserDetailViewModel(user: user)
-
-                    dismissalInteractor.isAtNavigationRoot = { [weak router] in
-                        router?.path.isEmpty ?? true
-                    }
+                    let dismissalInteractor = SwipeDismissalInteractor()
 
                     let detailRootView = UserDetailRootView(
-                        router: router,
-                        viewModel: viewModel,
+                        viewModel: UserDetailViewModel(user: user),
                         onEvent: { [weak self] event in self?.handle(event) }
                     )
+                    .environment(\\.swipeDismissalInteractor, dismissalInteractor)
+
                     // ...
                 }
+
+                // Feature 内では .swipeDismissable で宣言的に制御
+                NavigationStack(path: $path) {
+                    UserDetailView(/* ... */)
+                }
+                .swipeDismissable(isAtRoot: path.isEmpty)
                 """
             ),
         ],
@@ -350,7 +353,7 @@ enum PracticeInfoProvider {
         ポイント:
         ・SwiftUI View は既存の設計を変更不要（onEvent パターンはそのまま使用可能）
         ・UIKit Coordinator が App 層の Modal 状態・Tab 選択状態を管理
-        ・SwiftUI Router が Feature 内の path・modal 状態を管理
+        ・Feature の RootView が @State で Feature 内の path・modal 状態を管理
         ・イベントフロー: SwiftUI View → Event → UIHostingController → Coordinator → UIKit の遷移処理
         """,
         codeExamples: [
@@ -464,12 +467,12 @@ enum PracticeInfoProvider {
                 }
 
                 // sheet で表示
-                .sheet(item: $router.modal) { modal in
+                .sheet(item: $modal) { modal in
                     switch modal {
                     case .legacyProfile:
                         LegacyProfileModalView(
                             user: viewModel.user,
-                            onDismiss: { router.dismissModal() }
+                            onDismiss: { self.modal = nil }
                         )
                     }
                 }
@@ -525,53 +528,62 @@ enum PracticeInfoProvider {
         relatedPrinciples: [.f2, .e1]
     )
 
-    // MARK: - 手段12: Router は Environment で Feature 内に公開する
+    // MARK: - 手段12: RootView で @State を管理し、子 View にはクロージャで遷移トリガーを渡す
 
     static let practice12 = PracticeInfo(
         id: "practice12",
-        title: "Router は Environment で Feature 内に公開する",
+        title: "RootView で @State を管理し、子 View にはクロージャで遷移トリガーを渡す",
         description: """
-        Router は Feature 全体で共有する依存であり、\
-        Feature 内の複数の子 View からアクセスされうる。\
-        RootView で .environment(router) を設定し、\
-        子 View では @Environment(Router.self) で取得する。
+        RootView が @State で path / modal を直接管理し、\
+        子 View にはクロージャで遷移トリガーを渡す。\
+        子 View はクロージャを呼ぶだけで、遷移の実体を知らない。
 
-        Environment は View 階層を跨いで共有する\
-        サービス的な依存の伝搬に適した仕組みである。\
-        Router はまさにこの性質を持つため Environment が適切。
+        Environment は SwipeDismissalInteractor のように\
+        View 階層を跨いで共有するサービス的な依存の伝搬に使う。\
+        遷移トリガーのように「何をしたいか」を伝える用途には\
+        クロージャの方が依存関係が明確で適切。
 
         一方、ViewModel のように特定の View だけが消費する\
         1対1 の依存は init 引数で直接渡す。\
-        すべてを Environment に載せるのではなく、\
         依存の共有範囲に応じて使い分ける。
         """,
         codeExamples: [
             .init(
-                description: "RootView で Router を Environment に設定する例",
+                description: "RootView で @State を管理しクロージャで子 View に渡す例",
                 code: """
                 struct UserDetailRootView: View {
-                    @State private var router: UserDetailRouter
+                    @State private var path: [UserDetailPath] = []
+                    @State private var modal: UserDetailModal?
                     @State private var viewModel: UserDetailViewModel
 
                     var body: some View {
-                        NavigationStack(path: $router.path) {
-                            // ViewModel は init 引数で渡す（1対1 の依存）
-                            UserDetailView(viewModel: viewModel)
+                        NavigationStack(path: $path) {
+                            UserDetailView(
+                                viewModel: viewModel,
+                                onShowPhotoList: {
+                                    path.append(.photoList(viewModel.user.id))
+                                },
+                                onShowLikeSend: {
+                                    modal = .likeSend
+                                }
+                            )
                         }
-                        // Router は Environment で公開（Feature 全体で共有）
-                        .environment(router)
                     }
                 }
                 """
             ),
             .init(
-                description: "子 View で Router を Environment から取得する例",
+                description: "子 View がクロージャで遷移トリガーを受け取る例",
                 code: """
                 struct UserDetailView: View {
-                    @Environment(UserDetailRouter.self) private var router
                     let viewModel: UserDetailViewModel
+                    var onShowPhotoList: (() -> Void)?
+                    var onShowLikeSend: (() -> Void)?
 
-                    // ...
+                    var body: some View {
+                        Button("写真一覧") { onShowPhotoList?() }
+                        Button("いいね！") { onShowLikeSend?() }
+                    }
                 }
                 """
             ),
@@ -588,22 +600,22 @@ enum PracticeInfoProvider {
         View は Feature 固有 View と再利用可能 View に分類できる。
 
         Feature 固有 View は特定の Feature でのみ使用されるため、\
-        Features/XXX/Views/ に配置し、@Environment で Router を直接参照してよい。\
+        Features/XXX/Views/ に配置し、クロージャで遷移トリガーを受け取る。\
         一方、再利用可能 View は複数の Feature で使用される可能性があるため、\
-        特定の Router 型に依存してはならない。\
+        Feature のドメインモデルに強く結合してはならない。\
         Feature に依存しない View は Shared/Components/ 等の\
         Feature 外ディレクトリに配置する。
 
-        判断基準: その View が特定の Router 型に依存することで、\
-        不自然な依存（使わない Feature の Router を import する等）が生まれるなら、\
+        判断基準: その View が Feature のドメインモデルに強く結合することで、\
+        不自然な依存が生まれるなら、\
         その View は再利用可能 View としてコールバックで委譲すべきである。
 
         再利用可能 View はコールバック（クロージャ）で「意図」を上位に伝え、\
         RootView の navigationDestination 内で\
-        コールバックと Router を接続する。
+        コールバックと @State の変更を接続する。
 
         ディレクトリ構成例:
-        Features/UserProfile/Views/  … Feature 固有 View（Router 参照可）
+        Features/UserProfile/Views/  … Feature 固有 View（クロージャ委譲）
         Shared/Components/           … 再利用可能 View（コールバック委譲）
         Shared/Models/               … 共有モデル
         """,
@@ -628,16 +640,16 @@ enum PracticeInfoProvider {
                 """
             ),
             .init(
-                description: "RootView でコールバックと Router を接続する",
+                description: "RootView でコールバックと @State を接続する",
                 code: """
-                .navigationDestination(for: UserDetailPath.self) { path in
-                    switch path {
+                .navigationDestination(for: UserDetailPath.self) { destination in
+                    switch destination {
                     case .photoList(let userId):
                         UserPhotoListView(
                             photos: viewModel.photos,
                             onSelectPhoto: { photoId in
-                                // コールバックを受けて Router で遷移
-                                router.path.append(.photoDetail(photoId))
+                                // コールバックを受けて @State で遷移
+                                path.append(.photoDetail(photoId))
                             }
                         )
                     case .photoDetail(let photoId):
