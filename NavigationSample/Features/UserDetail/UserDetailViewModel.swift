@@ -23,18 +23,19 @@ final class UserDetailViewModel {
     /// 表示モード
     let displayMode: DisplayMode
 
-    /// いいね済みかどうか（実際のアプリでは API から取得した初期値を使用）
-    var isLiked: Bool
+    /// いいね済みかどうか（LikeStore 経由で取得）
+    var isLiked: Bool {
+        LikeStore.shared.isLiked(userId: user.id)
+    }
 
-    init(user: User, displayMode: DisplayMode = .standard, isLiked: Bool = false) {
+    init(user: User, displayMode: DisplayMode = .standard) {
         self.user = user
         self.displayMode = displayMode
-        self.isLiked = isLiked
     }
 
     /// いいねを送る（実際のアプリでは API リクエストを行う）
     func sendLike(_ type: LikeType) {
-        isLiked = true
+        LikeStore.shared.markAsLiked(userId: user.id)
     }
 
     /// ユーザをブロックする（実際のアプリでは API リクエストを行う）
