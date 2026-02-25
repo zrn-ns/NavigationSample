@@ -4,6 +4,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 /// fullScreenModal を push のようなアニメーションで表示するためのトランジションアニメーター
 final class PushTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
@@ -127,11 +128,10 @@ final class SwipeDismissalInteractor: UIPercentDrivenInteractiveTransition {
     private(set) var isInteracting = false
     private weak var viewController: UIViewController?
 
-    /// NavigationStack の root 画面かどうかを判定するクロージャ
+    /// NavigationStack の root 画面かどうか
     ///
-    /// Coordinator が router.path.isEmpty を遅延参照するクロージャを設定する。
     /// root 画面でのみ dismiss ジェスチャーを許可し、pushed 画面では抑制する。
-    var isAtNavigationRoot: () -> Bool = { true }
+    var isAtNavigationRoot: Bool = true
 
     /// 対象の VC にスワイプジェスチャーを追加する
     func attach(to viewController: UIViewController) {
@@ -191,6 +191,39 @@ extension SwipeDismissalInteractor: UIGestureRecognizerDelegate {
         guard velocity.x > 0 && abs(velocity.x) > abs(velocity.y) else { return false }
 
         // pushed 画面では dismiss を抑制し、NavigationStack の pop に任せる
-        return isAtNavigationRoot()
+        return isAtNavigationRoot
+    }
+}
+
+// MARK: - SwiftUI Integration
+
+private struct SwipeDismissalInteractorKey: EnvironmentKey {
+    static let defaultValue: SwipeDismissalInteractor? = nil
+}
+
+extension EnvironmentValues {
+    var swipeDismissalInteractor: SwipeDismissalInteractor? {
+        get { self[SwipeDismissalInteractorKey.self] }
+        set { self[SwipeDismissalInteractorKey.self] = newValue }
+    }
+}
+
+extension View {
+    /// NavigationStack の root 状態に連動してスワイプ dismiss を制御する
+    func swipeDismissable(isAtRoot: Bool) -> some View {
+        modifier(SwipeDismissableModifier(isAtRoot: isAtRoot))
+    }
+}
+
+private struct SwipeDismissableModifier: ViewModifier {
+    let isAtRoot: Bool
+    @Environment(\.swipeDismissalInteractor) private var interactor
+
+    func body(content: Content) -> some View {
+        content
+            .onAppear { interactor?.isAtNavigationRoot = isAtRoot }
+            .onChange(of: isAtRoot) { _, newValue in
+                interactor?.isAtNavigationRoot = newValue
+            }
     }
 }

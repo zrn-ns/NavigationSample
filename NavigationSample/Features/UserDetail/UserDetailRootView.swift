@@ -22,13 +22,9 @@ struct UserDetailRootView: View {
     /// 上位へのイベント通知
     let onEvent: (UserDetailEvent) -> Void
 
-    /// ナビゲーションルートの変化を通知（path.isEmpty の変化時に呼ばれる）
-    var onNavigationRootChanged: ((Bool) -> Void)?
-
-    init(viewModel: UserDetailViewModel, onEvent: @escaping (UserDetailEvent) -> Void, onNavigationRootChanged: ((Bool) -> Void)? = nil) {
+    init(viewModel: UserDetailViewModel, onEvent: @escaping (UserDetailEvent) -> Void) {
         self._viewModel = State(initialValue: viewModel)
         self.onEvent = onEvent
-        self.onNavigationRootChanged = onNavigationRootChanged
     }
 
     var body: some View {
@@ -71,9 +67,7 @@ struct UserDetailRootView: View {
                     }
                 }
         }
-        .onChange(of: path.isEmpty) { _, newValue in
-            onNavigationRootChanged?(newValue)
-        }
+        .swipeDismissable(isAtRoot: path.isEmpty)
         .sheet(item: $modal) { modal in
             switch modal {
             case .likeSend:

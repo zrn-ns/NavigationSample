@@ -43,25 +43,20 @@ final class UserGridCoordinator {
     func showUserDetail(user: User) {
         let viewModel = UserDetailViewModel(user: user)
 
-        // root 画面でのみスワイプ dismiss を許可する
-        let dismissalInteractor = transitioningDelegate.dismissalInteractor
-        var isAtRoot = true
-        dismissalInteractor.isAtNavigationRoot = { isAtRoot }
-
         let detailRootView = UserDetailRootView(
             viewModel: viewModel,
             onEvent: { [weak self] event in
                 self?.handle(event)
-            },
-            onNavigationRootChanged: { isAtRoot = $0 }
+            }
         )
+        .environment(\.swipeDismissalInteractor, transitioningDelegate.dismissalInteractor)
+
         let hostingController = UIHostingController(rootView: detailRootView)
 
-        // fullScreenModal + カスタムトランジション
         hostingController.modalPresentationStyle = .fullScreen
         hostingController.transitioningDelegate = transitioningDelegate
 
-        dismissalInteractor.attach(to: hostingController)
+        transitioningDelegate.dismissalInteractor.attach(to: hostingController)
 
         presentedDetailVC = hostingController
         navigationController.present(hostingController, animated: true)
